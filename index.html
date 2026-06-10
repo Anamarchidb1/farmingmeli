@@ -1204,9 +1204,9 @@ plasCard.innerHTML=`
 `;
 insightGrid.appendChild(plasCard);
 
-const M12_MONTH_LABELS = ["jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26"];
-const MONTHLY = {"ortobom": [{"name": "Mercado Livre", "color": "#185FA5", "isML": true, "gmv": [4445643, 3073030, 2633756, 3317491, 3548013, 5856907, 3639625, 4148761, 2078650, 3643496, 1872938, 3158570], "ped": [7360, 4685, 3687, 5057, 4793, 7089, 4921, 5091, 2671, 4901, 2435, 3950]}, {"name": "Magazine Luiza", "color": "#C83264", "isML": false, "gmv": [2027526, 453263, 1367731, 1511773, 1580859, 2901529, 1906782, 1838284, 797617, 1241047, 813151, 2314907], "ped": [2380, 501, 1567, 1498, 1547, 2550, 1825, 1835, 805, 1230, 771, 2102]}, {"name": "Shopee", "color": "#E9960A", "isML": false, "gmv": [0, 3720, 24681, 144346, 406327, 935169, 938987, 1133625, 847977, 1035497, 808187, 921613], "ped": [0, 6, 41, 264, 617, 1409, 1435, 1673, 1223, 1451, 1106, 1224]}, {"name": "Cnova", "color": "#3B6D11", "isML": false, "gmv": [798067, 354040, 340835, 505952, 444980, 715239, 377478, 587379, 502860, 334501, 373786, 508689], "ped": [1263, 499, 499, 721, 586, 1138, 515, 895, 738, 451, 421, 571]}, {"name": "Amazon", "color": "#9099AE", "isML": false, "gmv": [73770, 41346, 23515, 31936, 22125, 316858, 155927, 36159, 82730, 94287, 58531, 68327], "ped": [226, 103, 61, 83, 56, 483, 260, 67, 131, 138, 86, 162]}, {"name": "Shopify", "color": "#2AA9A0", "isML": false, "gmv": [0, 0, 0, 0, 0, 0, 13153, 157536, 223527, 282663, 188963, 126644], "ped": [0, 0, 0, 0, 0, 0, 15, 160, 193, 246, 160, 115]}, {"name": "B2W", "color": "#B4B9C4", "isML": false, "gmv": [78118, 78489, 24357, 37300, 69093, 131875, 136054, 62377, 33706, 40891, 14259, 53642], "ped": [105, 101, 26, 54, 93, 156, 138, 60, 40, 40, 20, 47]}, {"name": "Web Continental", "color": "#636975", "isML": false, "gmv": [0, 0, 1108, 13139, 28190, 46662, 63708, 50294, 29196, 38822, 41516, 362583], "ped": [0, 0, 2, 18, 24, 56, 97, 80, 50, 60, 48, 375]}]};
-const STORE_NAMES = {"ortobom": "Ortobom"};
+let M12_MONTH_LABELS = ["jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26"];
+let MONTHLY = {"ortobom": [{"name": "Mercado Livre", "color": "#185FA5", "isML": true, "gmv": [4445643, 3073030, 2633756, 3317491, 3548013, 5856907, 3639625, 4148761, 2078650, 3643496, 1872938, 3158570], "ped": [7360, 4685, 3687, 5057, 4793, 7089, 4921, 5091, 2671, 4901, 2435, 3950]}, {"name": "Magazine Luiza", "color": "#C83264", "isML": false, "gmv": [2027526, 453263, 1367731, 1511773, 1580859, 2901529, 1906782, 1838284, 797617, 1241047, 813151, 2314907], "ped": [2380, 501, 1567, 1498, 1547, 2550, 1825, 1835, 805, 1230, 771, 2102]}, {"name": "Shopee", "color": "#E9960A", "isML": false, "gmv": [0, 3720, 24681, 144346, 406327, 935169, 938987, 1133625, 847977, 1035497, 808187, 921613], "ped": [0, 6, 41, 264, 617, 1409, 1435, 1673, 1223, 1451, 1106, 1224]}, {"name": "Cnova", "color": "#3B6D11", "isML": false, "gmv": [798067, 354040, 340835, 505952, 444980, 715239, 377478, 587379, 502860, 334501, 373786, 508689], "ped": [1263, 499, 499, 721, 586, 1138, 515, 895, 738, 451, 421, 571]}, {"name": "Amazon", "color": "#9099AE", "isML": false, "gmv": [73770, 41346, 23515, 31936, 22125, 316858, 155927, 36159, 82730, 94287, 58531, 68327], "ped": [226, 103, 61, 83, 56, 483, 260, 67, 131, 138, 86, 162]}, {"name": "Shopify", "color": "#2AA9A0", "isML": false, "gmv": [0, 0, 0, 0, 0, 0, 13153, 157536, 223527, 282663, 188963, 126644], "ped": [0, 0, 0, 0, 0, 0, 15, 160, 193, 246, 160, 115]}, {"name": "B2W", "color": "#B4B9C4", "isML": false, "gmv": [78118, 78489, 24357, 37300, 69093, 131875, 136054, 62377, 33706, 40891, 14259, 53642], "ped": [105, 101, 26, 54, 93, 156, 138, 60, 40, 40, 20, 47]}, {"name": "Web Continental", "color": "#636975", "isML": false, "gmv": [0, 0, 1108, 13139, 28190, 46662, 63708, 50294, 29196, 38822, 41516, 362583], "ped": [0, 0, 2, 18, 24, 56, 97, 80, 50, 60, 48, 375]}]};
+let STORE_NAMES = {"ortobom": "Ortobom"};
 
 if (window.Chart) {
   Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
@@ -1255,8 +1255,71 @@ function renderChannelCompare(){
     `<span class="seller-dot" style="background:${cb}"></span><strong>${bn}</strong> ${fmtFull(gb)}　→　`+
     `${an} é <span class="${big?'delta-pos':'delta-neg'}">${big?'+':''}${diff.toFixed(1).replace('.',',')}%</span> ${big?'maior':'menor'} que ${bn}`;
 }
-const N = M12_MONTH_LABELS.length;
-const QN = Math.min(12, N), QSTART = N - QN, NQ = Math.floor(QN/3);
+let N, QN, QSTART, NQ;
+function recomputeM12Dims(){ N=M12_MONTH_LABELS.length; QN=Math.min(12,N); QSTART=N-QN; NQ=Math.floor(QN/3); }
+recomputeM12Dims();
+
+// ── Carregamento de lojas a partir da pasta /data (CSV por loja) ──
+function parseStoreCSV(text){
+  const NAME={'MERCADO_LIVRE':'Mercado Livre','SHOPEE':'Shopee','MAGAZINE_LUIZA':'Magazine Luiza','CNOVA':'Cnova',
+    'AMAZON_GLOBAL_API':'Amazon','AMAZON':'Amazon','B2W_NEW_API':'B2W','B2W':'B2W','MADEIRA_MADEIRA':'Madeira Madeira',
+    'WEB_CONTINENTAL_NEW_API':'Web Continental','WEB_CONTINENTAL':'Web Continental','SHOPIFY':'Shopify',
+    'LEROY_MERLIN':'Leroy Merlin','RENNER':'Renner','ZEMA':'Zema','EFACIL':'eFácil','SHOPPING_LIVELO':'Shopping Livelo',
+    'TIKTOK_SHOP':'TikTok Shop','TIKTOK':'TikTok Shop'};
+  const COLOR={'Mercado Livre':'#185FA5','Shopee':'#E9960A','Magazine Luiza':'#C83264','Cnova':'#3B6D11',
+    'Madeira Madeira':'#7F77DD','Web Continental':'#636975','Amazon':'#9099AE','B2W':'#B4B9C4','Shopify':'#2AA9A0',
+    'Leroy Merlin':'#5B8C2A','Renner':'#C0568A','Zema':'#A0A6B2','eFácil':'#CDD0D8','Shopping Livelo':'#9B8CE0','TikTok Shop':'#222'};
+  const FB=['#7E8AA0','#B0758C','#6FA0C8','#A88C5A'];
+  const hasMoney=s=>String(s).indexOf('$')>=0;
+  const pv=s=>{ s=String(s).replace('R$','').replace(/\$/g,'').replace(/\./g,'').replace(',','.').replace(/\s/g,'').trim();
+    if(s===''||s==='-')return 0; const n=parseFloat(s); return isNaN(n)?0:n; };
+  const titleize=s=>s.replace(/_/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  const lines=text.split(/\r?\n/).filter(l=>l.trim()!=='' && (l.split(';')[0]||'').replace(/^\uFEFF/,'').trim()!=='');
+  const rows=lines.map(l=>l.split(';'));
+  const hdr=rows[0].slice(1).map(h=>(h||'').replace(/^\uFEFF/,'').trim());
+  const triplet = hdr.length>=2 && /pedido/i.test(hdr[1]||'');
+  let labels=[]; if(triplet){ for(let i=0;i<hdr.length;i+=3) labels.push(hdr[i]); } else { labels=hdr.slice(); }
+  let channels=[], fb=0;
+  for(let r=1;r<rows.length;r++){
+    const raw=(rows[r][0]||'').replace(/^\uFEFF/,'').trim(); if(!raw) continue;
+    const name=NAME[raw]||titleize(raw); const cells=rows[r].slice(1); const gmv=[],ped=[];
+    for(let t=0;t<labels.length;t++){
+      if(triplet){ const a=cells[3*t]||'',b=cells[3*t+1]||'',c=cells[3*t+2]||''; let pc2;
+        if(hasMoney(b)&&!hasMoney(c))pc2=c; else if(hasMoney(c)&&!hasMoney(b))pc2=b; else pc2=b;
+        gmv.push(Math.round(pv(a))); ped.push(Math.round(pv(pc2))); }
+      else { gmv.push(Math.round(pv(cells[t]||''))); ped.push(0); }
+    }
+    let color=COLOR[name]; if(!color){ color=FB[fb%FB.length]; fb++; }
+    channels.push({name,color,isML:name==='Mercado Livre',gmv,ped});
+  }
+  if(labels.length>12){ labels=labels.slice(-12); channels.forEach(c=>{c.gmv=c.gmv.slice(-12);c.ped=c.ped.slice(-12);}); }
+  channels.sort((x,y)=>y.gmv.reduce((s,v)=>s+v,0)-x.gmv.reduce((s,v)=>s+v,0));
+  return {labels,channels};
+}
+async function loadStoresFromData(){
+  try{
+    const mr=await fetch('data/manifest.json',{cache:'no-store'}); if(!mr.ok) return null;
+    const manifest=await mr.json(); if(!Array.isArray(manifest)||!manifest.length) return null;
+    const stores={}, names={}; let labels=null;
+    for(const s of manifest){
+      try{ const cr=await fetch('data/'+s.file,{cache:'no-store'}); if(!cr.ok) continue;
+        const parsed=parseStoreCSV(await cr.text());
+        stores[s.key]=parsed.channels; names[s.key]=s.name||s.key; labels=parsed.labels;
+      }catch(e){}
+    }
+    return (Object.keys(stores).length && labels) ? {stores,names,labels} : null;
+  }catch(e){ return null; }
+}
+let M12_LOADED=false;
+async function ensureStoresThenBuild(){
+  if(!M12_LOADED){
+    M12_LOADED=true;
+    const data=await loadStoresFromData();
+    if(data){ MONTHLY=data.stores; STORE_NAMES=data.names; M12_MONTH_LABELS=data.labels; recomputeM12Dims();
+      const ks=Object.keys(MONTHLY); M12.seller = ks.length>1?'all':ks[0]; }
+  }
+  buildM12();
+}
 const OUTROS_COLOR = '#CDD0D8';
 const M12 = { seller:null, metric:'gmv', share:'pct' };
 (function(){ const ks=Object.keys(MONTHLY); M12.seller = ks.length>1?'all':ks[0]; })();
@@ -1495,7 +1558,7 @@ function setMode(mode){
   document.getElementById('tab-12m').classList.toggle('active',mode==='m12');
   const tm=document.getElementById('tab-meli'); if(tm) tm.classList.toggle('active',mode==='meli');
   if(mode==='monthly') setView(currentView);
-  else if(mode==='m12') buildM12();
+  else if(mode==='m12') ensureStoresThenBuild();
   else if(mode==='meli') initMeli();
 }
 
