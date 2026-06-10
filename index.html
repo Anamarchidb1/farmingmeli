@@ -304,6 +304,10 @@
   .seg{ border-radius:999px; padding:6px 13px; }
   .seg.active{ background:var(--blue); box-shadow:0 7px 15px -8px rgba(24,95,165,.85); }
   .ctrl-label{ color:var(--text3); letter-spacing:.1em; }
+  .m12-select{ font-family:var(--font); font-size:13px; font-weight:500; color:var(--text); background:var(--surface);
+    border:1.5px solid var(--border); border-radius:999px; padding:7px 16px; cursor:pointer; box-shadow:var(--shadow); }
+  .m12-select:hover{ border-color:var(--blue-mid); }
+  .m12-select:focus{ outline:2px solid var(--blue-mid); border-color:var(--blue); }
 
   .card{ border-radius:var(--radius); border:1px solid var(--border); padding:22px 24px; box-shadow:var(--shadow); }
   .card-title{ font-family:var(--display); font-size:15px; font-weight:600; letter-spacing:-.01em; color:var(--text); }
@@ -360,6 +364,53 @@
     border-radius:var(--radius-sm); padding:12px 14px; font-variant-numeric:tabular-nums; }
   .cmp-result strong{ color:var(--text); }
 
+  /* ── Aba MELI Destaque ── */
+  .meli-intro{ display:flex; justify-content:space-between; align-items:center; gap:18px; flex-wrap:wrap;
+    background:linear-gradient(135deg,#0B1220 0%,#101E36 60%,#163459 120%); border:1px solid #243049;
+    border-bottom:3px solid #FFE11A; border-radius:var(--radius); padding:22px 26px; margin-bottom:24px; color:#fff; }
+  .meli-eyebrow{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#FFE11A; }
+  .meli-intro h2{ font-family:var(--display); font-size:21px; font-weight:600; letter-spacing:-.015em; margin-top:4px; }
+  .meli-intro .sub{ color:rgba(255,255,255,.66); font-size:12.5px; margin-top:5px; max-width:560px; }
+  .peso-total{ text-align:center; background:rgba(255,225,26,.12); border:1px solid rgba(255,225,26,.4);
+    border-radius:999px; padding:10px 18px; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.7); }
+  .peso-total span{ display:block; font-family:var(--display); font-size:22px; font-weight:700; color:#FFE11A; letter-spacing:-.01em; }
+  .meli-group-label{ font-weight:700; letter-spacing:.12em; font-size:11px; text-transform:uppercase; margin:0 0 13px; }
+  .meli-group-label.tech{ color:#C9A800; } .meli-group-label.neg{ color:#C77C18; margin-top:24px; }
+  .meli-grid{ display:grid; gap:14px; }
+  .meli-grid.tech{ grid-template-columns:repeat(2,1fr); }
+  .meli-grid.neg{ grid-template-columns:repeat(3,1fr); }
+  .meli-card{ position:relative; overflow:hidden; color:#fff; border-radius:var(--radius); padding:18px 18px 16px;
+    background:linear-gradient(160deg,#0E1A2C 0%,#13243E 100%); border:1px solid #26344E; }
+  .meli-card::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:4px; }
+  .meli-card.tech::before{ background:#FFE11A; } .meli-card.neg::before{ background:#F0A93B; }
+  .meli-peso{ font-family:var(--display); font-size:30px; font-weight:700; letter-spacing:-.02em; line-height:1; }
+  .meli-card.tech .meli-peso{ color:#FFE11A; } .meli-card.neg .meli-peso{ color:#F4B65B; }
+  .meli-peso small{ display:block; font-family:var(--font); font-size:9px; font-weight:600; letter-spacing:.07em;
+    text-transform:uppercase; color:rgba(255,255,255,.5); margin-top:3px; }
+  .meli-crit{ font-family:var(--display); font-size:15px; font-weight:600; margin-top:10px; }
+  .meli-desc{ font-size:11.5px; color:rgba(255,255,255,.64); line-height:1.5; margin-top:5px; min-height:50px; }
+  .meli-inputs{ margin-top:12px; display:flex; flex-direction:column; gap:9px; }
+  .meli-inputs label{ font-size:9.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+    color:rgba(255,255,255,.55); display:flex; flex-direction:column; gap:5px; }
+  .meli-inputs input, .meli-inputs textarea{ font-family:var(--font); font-size:13px; color:#0F1B2D; background:#fff;
+    border:1px solid #33425C; border-radius:8px; padding:8px 10px; resize:vertical; }
+  .meli-inputs input::placeholder, .meli-inputs textarea::placeholder{ color:#9AA6BC; }
+  .meli-inputs input:focus, .meli-inputs textarea:focus{ outline:2px solid #FFE11A; border-color:#FFE11A; }
+  .meli-geral{ width:100%; font-family:var(--font); font-size:13px; color:var(--text); background:var(--surface);
+    border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:11px 13px; margin-top:10px; resize:vertical; }
+  .meli-geral:focus{ outline:2px solid var(--blue-mid); border-color:var(--blue); }
+  .meli-save-note{ font-size:11px; color:var(--text3); margin-top:12px; }
+  .meli-toolbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:22px; }
+  .meli-btn{ font-family:var(--font); font-size:12.5px; font-weight:600; border-radius:999px; padding:8px 15px;
+    cursor:pointer; border:1.5px solid var(--border); background:var(--surface); color:var(--text2);
+    transition:all .15s; display:inline-flex; align-items:center; gap:6px; }
+  .meli-btn:hover{ border-color:var(--blue-mid); color:var(--text); }
+  .meli-btn.primary{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .meli-btn.primary:hover{ background:#1a2c47; }
+  .meli-btn.ghost{ background:transparent; }
+  .meli-status{ font-size:11.5px; color:var(--text3); }
+  @media (max-width:820px){ .meli-grid.tech, .meli-grid.neg{ grid-template-columns:1fr; } }
+
   @media (prefers-reduced-motion:reduce){ *{ transition:none !important; } }
 
 </style>
@@ -378,7 +429,8 @@
 
   <div class="tabs-bar">
     <button class="tab active" id="tab-monthly" onclick="setMode('monthly')">Visão Mensal · Maio 2026</button>
-    <button class="tab" id="tab-12m" onclick="setMode('m12')">Análise 12 Meses · Ortobom</button>
+    <button class="tab" id="tab-12m" onclick="setMode('m12')">Análise Completa</button>
+    <button class="tab" id="tab-meli" onclick="setMode('meli')">MELI Destaque</button>
   </div>
 
   <div id="mode-monthly">
@@ -580,7 +632,7 @@
 
     <div class="controls-row">
       <div class="ctrl-group"><span class="ctrl-label">Seller</span>
-        <div class="seg-bar" id="m12-seller-seg"></div>
+        <select class="m12-select" id="m12-seller-select" onchange="setM12Seller(this.value)"></select>
       </div>
       <div class="ctrl-group"><span class="ctrl-label">Métrica</span>
         <div class="seg-bar" id="m12-metric-seg">
@@ -674,6 +726,84 @@
         </table>
       </div>
     </div>
+  </div>
+
+  <div id="mode-meli" style="display:none">
+    <div class="meli-intro">
+      <div>
+        <div class="meli-eyebrow">Prêmio ML XP · Integradores</div>
+        <h2>Calibração de KPIs do prêmio</h2>
+        <p class="sub">Acompanhe as parciais de cada critério e registre observações. Pesos conforme o racional do Mercado Livre.</p>
+      </div>
+      <div class="peso-total">Peso total<span>100%</span></div>
+    </div>
+
+    <div class="meli-toolbar">
+      <button class="meli-btn primary" onclick="meliExport()">⬇ Exportar parciais (JSON)</button>
+      <label class="meli-btn">⬆ Importar JSON<input type="file" accept="application/json" onchange="meliImport(this.files[0])" hidden></label>
+      <button class="meli-btn ghost" onclick="meliReloadPublished()">↻ Recarregar do publicado</button>
+      <span class="meli-status" id="meli-status"></span>
+    </div>
+
+    <div class="meli-group-label tech">Métricas Técnicas · 50%</div>
+    <div class="meli-grid tech">
+        <div class="meli-card tech">
+          <div class="meli-peso">40%<small>do peso da nota</small></div>
+          <div class="meli-crit">Iniciativas</div>
+          <div class="meli-desc">Velocidade e qualidade de entrega das iniciativas técnicas atribuídas pelo ML</div>
+          <div class="meli-inputs">
+            <label>Parcial<input data-meli="iniciativas_parcial" type="text" placeholder="ex.: 85% / valor atual"></label>
+            <label>Observação<textarea data-meli="iniciativas_obs" rows="2" placeholder="anotações..."></textarea></label>
+          </div>
+        </div>
+        <div class="meli-card tech">
+          <div class="meli-peso">10%<small>do peso da nota</small></div>
+          <div class="meli-crit">% Erro APIs</div>
+          <div class="meli-desc">Taxa de erros no consumo das APIs do ML nos últimos 3 meses</div>
+          <div class="meli-inputs">
+            <label>Parcial<input data-meli="erro_apis_parcial" type="text" placeholder="ex.: 85% / valor atual"></label>
+            <label>Observação<textarea data-meli="erro_apis_obs" rows="2" placeholder="anotações..."></textarea></label>
+          </div>
+        </div>
+    </div>
+
+    <div class="meli-group-label neg">Métricas de Negócio · 50%</div>
+    <div class="meli-grid neg">
+        <div class="meli-card neg">
+          <div class="meli-peso">20%<small>do peso da nota</small></div>
+          <div class="meli-crit">% Cresc. NMV</div>
+          <div class="meli-desc">Crescimento do volume de transações (NMV) gerado pelos sellers do integrador</div>
+          <div class="meli-inputs">
+            <label>Parcial<input data-meli="cresc_nmv_parcial" type="text" placeholder="ex.: 85% / valor atual"></label>
+            <label>Observação<textarea data-meli="cresc_nmv_obs" rows="2" placeholder="anotações..."></textarea></label>
+          </div>
+        </div>
+        <div class="meli-card neg">
+          <div class="meli-peso">20%<small>do peso da nota</small></div>
+          <div class="meli-crit">% Cresc. Sellers</div>
+          <div class="meli-desc">Crescimento de usuários ativos (AU) que operam com o integrador</div>
+          <div class="meli-inputs">
+            <label>Parcial<input data-meli="cresc_sellers_parcial" type="text" placeholder="ex.: 85% / valor atual"></label>
+            <label>Observação<textarea data-meli="cresc_sellers_obs" rows="2" placeholder="anotações..."></textarea></label>
+          </div>
+        </div>
+        <div class="meli-card neg">
+          <div class="meli-peso">10%<small>do peso da nota</small></div>
+          <div class="meli-crit">% Cresc. NOLs</div>
+          <div class="meli-desc">Quantidade de novos anúncios/listings (NOLs) criados na plataforma do ML via integração</div>
+          <div class="meli-inputs">
+            <label>Parcial<input data-meli="cresc_nols_parcial" type="text" placeholder="ex.: 85% / valor atual"></label>
+            <label>Observação<textarea data-meli="cresc_nols_obs" rows="2" placeholder="anotações..."></textarea></label>
+          </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+      <div class="card-title">Observações gerais</div>
+      <div class="card-sub">Anotações livres sobre o ciclo do prêmio</div>
+      <textarea data-meli="geral_obs" class="meli-geral" rows="4" placeholder="Contexto, pontos de atenção, próximos passos..."></textarea>
+    </div>
+    <div class="meli-save-note">As parciais e observações ficam salvas no seu navegador e persistem no site publicado.</div>
   </div>
 
   <div class="footer">
@@ -1152,10 +1282,10 @@ function m12Agg(sellerKey){
 }
 
 function buildM12Seller(){
+  const sel=document.getElementById('m12-seller-select'); if(!sel) return;
   const ks=Object.keys(MONTHLY);
-  const opts = ks.length>1 ? [['all','Todos'],...ks.map(k=>[k,STORE_NAMES[k]||k])] : ks.map(k=>[k,STORE_NAMES[k]||k]);
-  document.getElementById('m12-seller-seg').innerHTML = opts.map(([k,l])=>
-    `<button class="seg ${k===M12.seller?'active':''}" onclick="setM12Seller('${k}')">${l}</button>`).join('');
+  const opts = ks.length>1 ? [['all','Todos os sellers'],...ks.map(k=>[k,STORE_NAMES[k]||k])] : ks.map(k=>[k,STORE_NAMES[k]||k]);
+  sel.innerHTML = opts.map(([k,l])=>`<option value="${k}" ${k===M12.seller?'selected':''}>${l}</option>`).join('');
 }
 
 function buildM12(){
@@ -1324,13 +1454,49 @@ function computeAds(){
   document.getElementById('m12-ads-monthly').innerHTML=body+media+total;
 }
 
+let MELI_INIT=false;
+function meliLoad(){ try{ return JSON.parse(localStorage.getItem('meli_destaque')||'{}'); }catch(e){ return {}; } }
+function meliSave(o){ try{ localStorage.setItem('meli_destaque', JSON.stringify(o)); }catch(e){} }
+function meliStatus(t){ const el=document.getElementById('meli-status'); if(el) el.textContent=t; }
+function meliCollect(){ const o={}; document.querySelectorAll('#mode-meli [data-meli]').forEach(el=>o[el.getAttribute('data-meli')]=el.value); o._updatedAt=new Date().toISOString(); return o; }
+function meliApply(st){ if(!st) return; document.querySelectorAll('#mode-meli [data-meli]').forEach(el=>{ const k=el.getAttribute('data-meli'); if(st[k]!=null) el.value=st[k]; }); }
+async function meliFetchPublished(){ try{ const r=await fetch('data/meli_destaque.json',{cache:'no-store'}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }
+function meliExport(){
+  const o=meliCollect(); const blob=new Blob([JSON.stringify(o,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='meli_destaque.json';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  meliStatus('Arquivo gerado. Suba em data/meli_destaque.json no repositório para todos verem.');
+}
+function meliImport(file){ if(!file) return; const r=new FileReader();
+  r.onload=()=>{ try{ const st=JSON.parse(r.result); meliApply(st); meliSave(st); meliStatus('JSON importado e salvo localmente.'); }
+    catch(e){ meliStatus('Arquivo inválido — não é um JSON válido.'); } };
+  r.readAsText(file); }
+async function meliReloadPublished(){ const st=await meliFetchPublished();
+  if(st){ meliApply(st); meliSave(st); meliStatus('Carregado de data/meli_destaque.json (rascunho local descartado).'); }
+  else meliStatus('Nenhum data/meli_destaque.json publicado foi encontrado.'); }
+async function initMeli(){
+  if(MELI_INIT) return; MELI_INIT=true;
+  const published=await meliFetchPublished();
+  const local=meliLoad();
+  const st=Object.assign({}, published||{}, local);
+  meliApply(st);
+  if(published){ meliStatus('Exibindo parciais publicadas'+(Object.keys(local).length?' + suas edições locais ainda não publicadas.':'.')); }
+  else { meliStatus('Sem arquivo publicado ainda — preencha e use "Exportar parciais".'); }
+  document.querySelectorAll('#mode-meli [data-meli]').forEach(el=>{
+    const k=el.getAttribute('data-meli');
+    el.addEventListener('input',()=>{ st[k]=el.value; meliSave(st); });
+  });
+}
+
 function setMode(mode){
-  const monthly=mode==='monthly';
-  document.getElementById('mode-monthly').style.display=monthly?'':'none';
-  document.getElementById('mode-12m').style.display=monthly?'none':'';
-  document.getElementById('tab-monthly').classList.toggle('active',monthly);
-  document.getElementById('tab-12m').classList.toggle('active',!monthly);
-  if(monthly) setView(currentView); else buildM12();
+  const map={monthly:'mode-monthly', m12:'mode-12m', meli:'mode-meli'};
+  Object.entries(map).forEach(([m,id])=>{ const el=document.getElementById(id); if(el) el.style.display=(m===mode)?'':'none'; });
+  document.getElementById('tab-monthly').classList.toggle('active',mode==='monthly');
+  document.getElementById('tab-12m').classList.toggle('active',mode==='m12');
+  const tm=document.getElementById('tab-meli'); if(tm) tm.classList.toggle('active',mode==='meli');
+  if(mode==='monthly') setView(currentView);
+  else if(mode==='m12') buildM12();
+  else if(mode==='meli') initMeli();
 }
 
 // Init
