@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Ortobom — Mensal + 12 Meses</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F8FA;
+    --surface: #FFFFFF;
+    --surface2: #F1F3F6;
+    --border: #E2E6EC;
+    --text: #1A1F2E;
+    --text2: #5A6378;
+    --text3: #9099AE;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --blue-mid: #378ADD;
+    --shopee: #E9960A;
+    --magalu: #C83264;
+    --cnova: #3B6D11;
+    --purple: #7F77DD;
+    --gray: #9099AE;
+    --gray-light: #D3D6DE;
+    --green: #1A8A4C;
+    --red: #C53030;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 4px rgba(0,0,0,.08), 0 0 1px rgba(0,0,0,.06);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--blue);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header-left h1 { font-size: 18px; font-weight: 600; color: #fff; }
+  .header-left p  { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 2px; }
+  .header-badge   { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+                    color: #fff; font-size: 11px; font-weight: 600; padding: 4px 12px;
+                    border-radius: 20px; letter-spacing: .04em; white-space: nowrap; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 24px 40px; }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+  .kpi-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .kpi-card.highlight { background: var(--blue); border-color: var(--blue); }
+  .kpi-label  { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+                color: var(--text3); margin-bottom: 6px; }
+  .kpi-card.highlight .kpi-label { color: rgba(255,255,255,.7); }
+  .kpi-value  { font-size: 22px; font-weight: 700; color: var(--text); }
+  .kpi-card.highlight .kpi-value { color: #fff; }
+  .kpi-sub    { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .kpi-card.highlight .kpi-sub   { color: rgba(255,255,255,.65); }
+
+  /* ── TABS ── */
+  .tabs-bar {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 6px; margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .tab {
+    padding: 7px 18px; border-radius: var(--radius-sm); border: none;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    background: transparent; color: var(--text2);
+    transition: all .15s ease;
+  }
+  .tab:hover { background: var(--surface2); color: var(--text); }
+  .tab.active { background: var(--blue); color: #fff; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--text3); margin-bottom: 12px;
+  }
+
+  /* ── GRID LAYOUTS ── */
+  .grid-2   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3   { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4   { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .card-sub { font-size: 11px; color: var(--text3); margin-bottom: 16px; }
+
+  /* ── CHART WRAPPERS ── */
+  .chart-wrap { position: relative; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 5px;
+                 font-size: 11px; color: var(--text2); }
+  .legend-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── HORIZONTAL BARS ── */
+  .hbar-list { display: flex; flex-direction: column; gap: 9px; }
+  .hbar-row  { display: flex; align-items: center; gap: 8px; }
+  .hbar-name { flex: 0 0 130px; font-size: 12px; color: var(--text2);
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 20px;
+                position: relative; overflow: hidden; }
+  .hbar-fill  { height: 100%; border-radius: 4px; display: flex; align-items: center;
+                padding: 0 6px; font-size: 10px; font-weight: 600; color: #fff;
+                min-width: 6px; transition: width .5s cubic-bezier(.4,0,.2,1); }
+  .hbar-val   { flex: 0 0 72px; font-size: 11px; font-weight: 600; text-align: right;
+                color: var(--text); }
+  .hbar-pct   { flex: 0 0 40px; font-size: 11px; color: var(--text3); text-align: right; }
+  .ml-dot     { width: 7px; height: 7px; border-radius: 50%; background: var(--blue);
+                flex-shrink: 0; }
+
+  /* ── ML COMPARISON TABLE ── */
+  .ml-compare { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .ml-compare th { font-size: 10px; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: .05em; color: var(--text3); padding: 0 10px 10px;
+                   text-align: left; border-bottom: 1px solid var(--border); }
+  .ml-compare th:not(:first-child) { text-align: right; }
+  .ml-compare td { padding: 8px 10px; border-bottom: 1px solid var(--border);
+                   vertical-align: middle; }
+  .ml-compare td:not(:first-child) { text-align: right; }
+  .ml-compare tr.is-ml td { background: var(--blue-light); font-weight: 600; }
+  .ml-compare tr:last-child td { border-bottom: none; }
+  .ml-compare tr:hover td { background: var(--surface2); }
+  .ml-compare tr.is-ml:hover td { background: #D4E8F7; }
+  .rank-badge { display: inline-block; font-size: 10px; font-weight: 700;
+                padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+  .rank-1 { background: #FEF9C3; color: #854D0E; }
+  .rank-2 { background: #E6F1FB; color: var(--blue); }
+  .rank-3 { background: #F3F4F6; color: var(--text2); }
+  .badge-ml { background: var(--blue); color: #fff; font-size: 9px; font-weight: 700;
+              padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .delta-pos { color: var(--green); font-weight: 600; }
+  .delta-neg { color: var(--red); font-weight: 600; }
+
+  /* ── INSIGHT PILLS ── */
+  .insight-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+  .insight-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; cursor: pointer;
+    transition: all .2s; box-shadow: var(--shadow);
+  }
+  .insight-card:hover { border-color: var(--blue-mid); transform: translateY(-1px); }
+  .insight-card.active { border-color: var(--blue); border-width: 2px; }
+  .insight-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .insight-pct  { font-size: 20px; font-weight: 700; }
+  .insight-sub  { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .pct-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 8px; overflow: hidden; }
+  .pct-fill { height: 100%; border-radius: 2px; background: var(--blue); transition: width .5s; }
+
+  /* ── SUMMARY TABLE ── */
+  .summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .summary-table th { font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--text3); padding: 0 12px 10px;
+    text-align: left; border-bottom: 2px solid var(--border); }
+  .summary-table th:not(:first-child) { text-align: right; }
+  .summary-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .summary-table td:not(:first-child) { text-align: right; }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table tr.total-row td { font-weight: 700; background: var(--surface2); border-top: 2px solid var(--border); }
+  .seller-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+  /* ── FOOTER ── */
+  .footer { text-align: center; font-size: 11px; color: var(--text3); margin-top: 32px;
+            padding-top: 20px; border-top: 1px solid var(--border); }
+
+  /* ── SEPARADORES ── */
+  .mb-20 { margin-bottom: 20px; }
+  .mb-24 { margin-bottom: 24px; }
+  .mt-20 { margin-top: 20px; }
+
+  .controls-row { display:flex; gap:18px; flex-wrap:wrap; align-items:center; margin-bottom:20px; }
+  .ctrl-group { display:flex; gap:8px; align-items:center; }
+  .ctrl-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text3); }
+  .seg-bar { display:inline-flex; gap:4px; background:var(--surface); border:1px solid var(--border);
+             border-radius:var(--radius-sm); padding:4px; box-shadow:var(--shadow); flex-wrap:wrap; }
+  .seg { padding:5px 12px; border:none; border-radius:4px; font-size:12px; font-weight:500;
+         cursor:pointer; background:transparent; color:var(--text2); transition:all .15s; }
+  .seg:hover { background:var(--surface2); color:var(--text); }
+  .seg.active { background:var(--blue); color:#fff; }
+  .qstrip { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:18px; }
+  .qcell { background:var(--surface2); border-radius:var(--radius-sm); padding:11px 13px; }
+  .qcell .q-name { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--text3); }
+  .qcell .q-val { font-size:17px; font-weight:700; margin-top:3px; color:var(--text); }
+  .qcell .q-delta { font-size:11px; font-weight:600; margin-top:3px; }
+  .banner-real { background:#E9F5EE; border:1px solid #A9D9BF; color:#1A6B41; font-size:12px;
+                 padding:10px 14px; border-radius:var(--radius-sm); margin-bottom:20px;
+                 display:flex; gap:8px; align-items:center; }
+  @media (max-width:720px){ .qstrip{ grid-template-columns:repeat(2,1fr);} }
+  /* ── ADS simulator ── */
+  .ads-highlight { display:flex; justify-content:space-between; align-items:center; gap:16px;
+    background:var(--blue); color:#fff; border-radius:var(--radius-sm); padding:16px 18px; margin:6px 0 20px; flex-wrap:wrap; }
+  .ads-h-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:rgba(255,255,255,.75); }
+  .ads-h-value { font-size:26px; font-weight:700; margin-top:4px; }
+  .ads-h-sub { font-size:11px; color:rgba(255,255,255,.7); margin-top:3px; }
+  .ads-h-badge { text-align:center; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
+    border-radius:var(--radius-sm); padding:8px 16px; }
+  .ads-h-badge span { font-size:22px; font-weight:700; display:block; }
+  .ads-h-badge small { font-size:10px; color:rgba(255,255,255,.75); }
+  .ads-calc { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+  .ads-field { display:flex; flex-direction:column; gap:5px; }
+  .ads-field label { font-size:11px; font-weight:600; color:var(--text2); }
+  .ads-field input { border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px;
+    font-size:14px; font-family:inherit; color:var(--text); background:var(--surface); width:100%; }
+  .ads-field.hl input { border-color:var(--blue-mid); background:var(--blue-light); font-weight:600; }
+  .ads-field input:focus { outline:2px solid var(--blue-mid); border-color:var(--blue); }
+  .ads-results { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .ads-cell { background:var(--surface2); border-radius:var(--radius-sm); padding:12px 14px; }
+  .ads-cell.proj { background:#E9F5EE; border:1px solid #A9D9BF; }
+  .ac-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--text3); }
+  .ac-value { font-size:18px; font-weight:700; margin-top:3px; color:var(--text); }
+  .ac-sub { font-size:10px; color:var(--text3); margin-top:2px; }
+  .ads-note { font-size:11px; color:var(--text3); margin-top:14px; line-height:1.55; }
+  @media (max-width:720px){ .ads-calc{ grid-template-columns:1fr 1fr;} .ads-results{ grid-template-columns:1fr;} }
+
+  /* ════════ REDESIGN — analytics premium ════════ */
+  :root{
+    --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --display:'Space Grotesk','Inter',sans-serif;
+    --bg:#ECEFF6; --surface:#FFFFFF; --surface2:#F4F6FB; --border:#E3E8F1;
+    --text:#0F1B2D; --text2:#586484; --text3:#93A0B8;
+    --blue:#185FA5; --blue-light:#E8F1FB; --blue-mid:#3E8AD8;
+    --ink:#0F1B2D; --ink2:#16263F; --green:#138A5B; --red:#D23B3B;
+    --radius:14px; --radius-sm:9px;
+    --shadow:0 1px 2px rgba(15,27,45,.04), 0 12px 30px -18px rgba(15,27,45,.22);
+  }
+  body{ font-family:var(--font); color:var(--text); -webkit-font-smoothing:antialiased;
+    background:radial-gradient(1100px 420px at 82% -140px, rgba(24,95,165,.07), transparent 60%), var(--bg); }
+  ::selection{ background:rgba(24,95,165,.18); }
+
+  .header{ background:linear-gradient(115deg,#0E1A2C 0%,#152540 52%,#1B3B62 100%);
+    padding:22px 32px; position:sticky; top:0; z-index:30;
+    box-shadow:0 16px 34px -24px rgba(0,0,0,.65); }
+  .header-left h1{ font-family:var(--display); font-weight:600; font-size:19px; letter-spacing:-.015em; }
+  .header-left p{ color:rgba(255,255,255,.6); font-size:12px; }
+  .header-badge{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
+    border-radius:999px; backdrop-filter:blur(6px); font-weight:600; }
+
+  .container{ max-width:1240px; padding:28px 24px 48px; }
+
+  .tabs-bar{ display:inline-flex; gap:4px; background:var(--surface); border:1px solid var(--border);
+    border-radius:999px; padding:5px; box-shadow:var(--shadow); }
+  .tab{ border-radius:999px; padding:8px 18px; font-weight:500; color:var(--text2); }
+  .tab:hover:not(.active){ background:var(--surface2); color:var(--text); }
+  .tab.active{ background:var(--ink); color:#fff; box-shadow:0 8px 18px -10px rgba(15,27,45,.7); }
+
+  .section-label{ font-family:var(--font); font-weight:700; font-size:10.5px; letter-spacing:.13em; color:var(--text3); }
+
+  .kpi-strip{ gap:14px; }
+  .kpi-card{ border-radius:var(--radius); border:1px solid var(--border); padding:18px 20px;
+    box-shadow:var(--shadow); transition:transform .18s ease, box-shadow .18s ease; }
+  .kpi-card:hover{ transform:translateY(-2px); }
+  .kpi-label{ font-size:10.5px; letter-spacing:.1em; color:var(--text3); }
+  .kpi-value{ font-family:var(--display); font-size:25px; font-weight:600; letter-spacing:-.02em;
+    line-height:1.12; font-feature-settings:'tnum' 1; }
+  .kpi-sub{ color:var(--text3); }
+  .kpi-card.highlight{ background:linear-gradient(140deg,#15315A 0%,#185FA5 100%); border-color:transparent; }
+  .kpi-card.highlight .kpi-value{ color:#fff; }
+
+  .insight-card{ border-radius:var(--radius); padding:15px 17px; box-shadow:var(--shadow);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .insight-card:hover{ transform:translateY(-2px); border-color:var(--blue-mid); }
+  .insight-name{ color:var(--text); }
+  .insight-pct{ font-family:var(--display); font-size:22px; font-weight:600; letter-spacing:-.02em; }
+  .insight-card.active{ border-color:var(--blue); border-width:1px; box-shadow:0 0 0 3px var(--blue-light), var(--shadow); }
+  .pct-fill{ background:var(--blue); }
+
+  .seg-bar{ border-radius:999px; padding:4px; box-shadow:var(--shadow); }
+  .seg{ border-radius:999px; padding:6px 13px; }
+  .seg.active{ background:var(--blue); box-shadow:0 7px 15px -8px rgba(24,95,165,.85); }
+  .ctrl-label{ color:var(--text3); letter-spacing:.1em; }
+
+  .card{ border-radius:var(--radius); border:1px solid var(--border); padding:22px 24px; box-shadow:var(--shadow); }
+  .card-title{ font-family:var(--display); font-size:15px; font-weight:600; letter-spacing:-.01em; color:var(--text); }
+  .card-sub{ color:var(--text3); font-size:11.5px; }
+
+  .hbar-track{ background:var(--surface2); height:22px; border-radius:999px; }
+  .hbar-fill{ border-radius:999px; }
+  .hbar-name{ color:var(--text2); }
+
+  .summary-table, .ml-compare{ font-variant-numeric:tabular-nums; }
+  .summary-table th, .ml-compare th{ color:var(--text3); letter-spacing:.07em; font-size:10px; }
+  .summary-table td, .ml-compare td{ border-color:var(--border); }
+  .summary-table tr:hover td{ background:var(--surface2); }
+  .summary-table tr.total-row td{ background:var(--surface2); font-weight:700; }
+  .seller-dot{ box-shadow:0 0 0 2px rgba(255,255,255,.6); }
+
+  .qcell{ border-radius:var(--radius-sm); }
+  .qcell .q-val{ font-family:var(--display); letter-spacing:-.01em; font-feature-settings:'tnum' 1; }
+
+  .banner-real, .banner-test{ border-radius:var(--radius-sm); }
+
+  /* ADS planner */
+  #ads-card{ background:linear-gradient(180deg,#FAFBFE 0%,#FFFFFF 60%); border-color:#DCE3F0; }
+  .ads-highlight{ background:linear-gradient(135deg,#0F1B2D 0%,#185FA5 120%); border-radius:var(--radius); }
+  .ads-h-value{ font-family:var(--display); font-size:28px; font-weight:600; letter-spacing:-.02em; font-feature-settings:'tnum' 1; }
+  .ads-h-badge{ border-radius:999px; }
+  .ads-h-badge span{ font-family:var(--display); }
+  .ads-field input{ border-radius:var(--radius-sm); border:1.5px solid var(--border); transition:border-color .15s; font-variant-numeric:tabular-nums; }
+  .ads-field input:hover{ border-color:var(--blue-mid); }
+  .ads-field.hl input{ background:var(--blue-light); border-color:var(--blue-mid); }
+  .ads-cell{ border-radius:var(--radius-sm); }
+  .ads-cell.proj{ background:linear-gradient(135deg,#E7F6EE 0%,#F3FBF7 100%); border-color:#A9D9BF; }
+  .ac-value{ font-family:var(--display); letter-spacing:-.01em; font-feature-settings:'tnum' 1; }
+
+  .footer{ color:var(--text3); }
+
+  ::-webkit-scrollbar{ height:10px; width:10px; }
+  ::-webkit-scrollbar-thumb{ background:#C7D0E0; border-radius:999px; border:2px solid var(--bg); }
+  ::-webkit-scrollbar-thumb:hover{ background:#AEB9CF; }
+
+  /* ML branding — acentos amarelo+azul nas áreas de análise / ANYMARKET */
+  .header{ border-bottom:3px solid #FFE11A; }
+  .kpi-card.highlight{ box-shadow:inset 0 3px 0 0 #FFD60A, var(--shadow); }
+  .ads-h-badge span{ color:#FFD60A; }
+  .badge-ml{ background:#FFD60A; color:#0F1B2D; }
+
+  /* Comparador de canais (ranking) */
+  .rank-compare{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:16px; }
+  .cmp-select{ font-family:var(--font); font-size:13px; color:var(--text); background:var(--surface);
+    border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:7px 11px; cursor:pointer; }
+  .cmp-select:hover{ border-color:var(--blue-mid); }
+  .cmp-x{ color:var(--text3); font-weight:700; }
+  .cmp-result{ margin-top:12px; font-size:13px; color:var(--text2); background:var(--surface2);
+    border-radius:var(--radius-sm); padding:12px 14px; font-variant-numeric:tabular-nums; }
+  .cmp-result strong{ color:var(--text); }
+
+  @media (prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Performance por Marketplace — Análise ANYMARKET</h1>
+    <p>King House · Easy House · Ortobom · Oxford · Plasutil</p>
+  </div>
+  <span class="header-badge">Maio 2026</span>
+</div>
+
+<div class="container">
+
+  <div class="tabs-bar">
+    <button class="tab active" id="tab-monthly" onclick="setMode('monthly')">Visão Mensal · Maio 2026</button>
+    <button class="tab" id="tab-12m" onclick="setMode('m12')">Análise 12 Meses · Ortobom</button>
+  </div>
+
+  <div id="mode-monthly">
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip mb-24">
+    <div class="kpi-card">
+      <div class="kpi-label">GMV Total</div>
+      <div class="kpi-value">R$ 39,1M</div>
+      <div class="kpi-sub">5 sellers combinados</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total de Pedidos</div>
+      <div class="kpi-value">46.953</div>
+      <div class="kpi-sub">todos os canais</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ticket Médio Geral</div>
+      <div class="kpi-value">R$ 833</div>
+      <div class="kpi-sub">por pedido</div>
+    </div>
+    <div class="kpi-card highlight">
+      <div class="kpi-label">GMV Mercado Livre</div>
+      <div class="kpi-value">R$ 12,0M</div>
+      <div class="kpi-sub">30,7% do total dos sellers</div>
+    </div>
+    <div class="kpi-card highlight">
+      <div class="kpi-label">Pedidos Mercado Livre</div>
+      <div class="kpi-value">12.418</div>
+      <div class="kpi-sub">26,4% dos pedidos</div>
+    </div>
+  </div>
+
+  <!-- Insight Cards (seller switcher) -->
+  <div class="section-label">Selecione um seller para ver o detalhe</div>
+  <div class="insight-grid mb-24">
+    <div class="insight-card" id="ins-all" onclick="setView('all')">
+      <div class="insight-name">Todos os Sellers</div>
+      <div class="insight-pct" style="color:var(--blue)">30,7%</div>
+      <div class="insight-sub">ML no GMV total</div>
+      <div class="pct-bar"><div class="pct-fill" style="width:30.7%"></div></div>
+    </div>
+    <div class="insight-card" id="ins-easy" onclick="setView('easy')">
+      <div class="insight-name">Easy House</div>
+      <div class="insight-pct" style="color:#E9960A">15,6%</div>
+      <div class="insight-sub">ML no GMV — 3º canal</div>
+      <div class="pct-bar"><div class="pct-fill" style="width:15.6%;background:#E9960A"></div></div>
+    </div>
+    <div class="insight-card" id="ins-king" onclick="setView('king')">
+      <div class="insight-name">King House</div>
+      <div class="insight-pct" style="color:var(--blue)">35,5%</div>
+      <div class="insight-sub">ML no GMV — 2º canal</div>
+      <div class="pct-bar"><div class="pct-fill" style="width:35.5%"></div></div>
+    </div>
+    <div class="insight-card" id="ins-ortobom" onclick="setView('ortobom')">
+      <div class="insight-name">Ortobom</div>
+      <div class="insight-pct" style="color:var(--blue)">41,8%</div>
+      <div class="insight-sub">ML no GMV — 1º canal</div>
+      <div class="pct-bar"><div class="pct-fill" style="width:41.8%"></div></div>
+    </div>
+    <div class="insight-card" id="ins-oxford" onclick="setView('oxford')">
+      <div class="insight-name">Oxford</div>
+      <div class="insight-pct" style="color:var(--blue)">52,5%</div>
+      <div class="insight-sub">ML no GMV — 1º canal</div>
+      <div class="pct-bar"><div class="pct-fill" style="width:52.5%"></div></div>
+    </div>
+    <div style="display:none" id="ins-plasutil-wrap">
+    </div>
+  </div>
+
+  <!-- Todos: visão geral -->
+  <div id="view-all">
+    <div class="grid-2-1 mb-24">
+      <div class="card">
+        <div class="card-title">GMV por seller e canal (empilhado)</div>
+        <div class="card-sub">Composição do faturamento de cada seller por marketplace</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-sq" style="background:var(--blue)"></span>Mercado Livre</span>
+          <span class="legend-item"><span class="legend-sq" style="background:var(--shopee)"></span>Shopee</span>
+          <span class="legend-item"><span class="legend-sq" style="background:var(--magalu)"></span>Magazine Luiza</span>
+          <span class="legend-item"><span class="legend-sq" style="background:var(--cnova)"></span>Cnova</span>
+          <span class="legend-item"><span class="legend-sq" style="background:var(--purple)"></span>Madeira Madeira</span>
+          <span class="legend-item"><span class="legend-sq" style="background:var(--gray-light)"></span>Outros</span>
+        </div>
+        <div class="chart-wrap" style="height:300px">
+          <canvas id="chartStacked" role="img" aria-label="GMV empilhado por seller. King House lidera com R$16,7M."></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">% de ML em cada seller</div>
+        <div class="card-sub">Representatividade do Mercado Livre no GMV total do seller</div>
+        <div class="chart-wrap" style="height:300px">
+          <canvas id="chartMLPct" role="img" aria-label="Percentual do Mercado Livre no GMV de cada seller."></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela resumo -->
+    <div class="card mb-24">
+      <div class="card-title">Resumo consolidado por seller</div>
+      <div class="card-sub">GMV, pedidos, ticket médio e representatividade do Mercado Livre — maio 2026</div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Seller</th>
+            <th>GMV Total</th>
+            <th>Pedidos</th>
+            <th>Ticket Médio</th>
+            <th>GMV Mercado Livre</th>
+            <th>% ML no Seller</th>
+            <th>% Seller no Total</th>
+            <th>Canal Principal</th>
+            <th>Posição ML</th>
+          </tr>
+        </thead>
+        <tbody id="summary-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Ranking de canais -->
+    <div class="card">
+      <div class="card-title">Ranking de canais — GMV consolidado</div>
+      <div class="card-sub">Participação de cada marketplace no GMV total dos 5 sellers</div>
+      <div style="height:260px; position:relative">
+        <canvas id="chartChannelRank" role="img" aria-label="Ranking de canais por GMV consolidado. Shopee lidera."></canvas>
+      </div>
+      <div class="rank-compare">
+        <span class="ctrl-label">Comparar</span>
+        <select id="cmp-a" class="cmp-select"></select>
+        <span class="cmp-x">×</span>
+        <select id="cmp-b" class="cmp-select"></select>
+      </div>
+      <div class="cmp-result" id="cmp-result"></div>
+    </div>
+  </div>
+
+  <!-- Detalhe por Seller -->
+  <div id="view-seller" style="display:none">
+    <div id="seller-kpis" class="grid-4 mb-24"></div>
+
+    <div class="grid-2 mb-24">
+      <div class="card">
+        <div class="card-title" id="donut-title">Distribuição de GMV por canal</div>
+        <div class="card-sub" id="donut-sub"></div>
+        <div id="donut-legend" class="legend"></div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="chartDonut" role="img" aria-label="Rosca com distribuição de GMV por canal."></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">GMV por canal — barras horizontais</div>
+        <div class="card-sub">Ordenado por volume de faturamento</div>
+        <div class="hbar-list" id="hbar-channels" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-title">Mercado Livre vs demais canais — detalhe</div>
+      <div class="card-sub">ML destacado em azul. Colunas "vs ML" mostram diferença percentual em relação ao Mercado Livre.</div>
+      <div style="overflow-x:auto">
+        <table class="ml-compare" id="ml-compare-table">
+          <thead>
+            <tr>
+              <th>Canal</th>
+              <th>GMV (R$)</th>
+              <th>% no Seller</th>
+              <th>Pedidos</th>
+              <th>Ticket Médio (R$)</th>
+              <th>vs ML — GMV</th>
+              <th>vs ML — Pedidos</th>
+              <th>vs ML — Ticket</th>
+            </tr>
+          </thead>
+          <tbody id="ml-compare-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">ML vs Outros canais — visão comparativa</div>
+      <div class="card-sub">Mercado Livre x soma dos demais canais em GMV e pedidos</div>
+      <div class="grid-2">
+        <div class="chart-wrap" style="height:200px">
+          <canvas id="chartMLvsGMV" role="img" aria-label="Comparativo de GMV entre ML e outros canais."></canvas>
+        </div>
+        <div class="chart-wrap" style="height:200px">
+          <canvas id="chartMLvsPed" role="img" aria-label="Comparativo de pedidos entre ML e outros canais."></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /mode-monthly -->
+
+  <div id="mode-12m" style="display:none">
+    <div class="banner-real">✅ Dados reais — Ortobom · últimos 12 meses. Ticket validado contra GMV÷pedidos. Demais lojas e visão consolidada aguardando os arquivos.</div>
+
+    <div id="m12-kpis" class="kpi-strip mb-24"></div>
+
+    <div class="controls-row">
+      <div class="ctrl-group"><span class="ctrl-label">Seller</span>
+        <div class="seg-bar" id="m12-seller-seg"></div>
+      </div>
+      <div class="ctrl-group"><span class="ctrl-label">Métrica</span>
+        <div class="seg-bar" id="m12-metric-seg">
+          <button class="seg active" data-metric="gmv" onclick="setM12Metric('gmv')">GMV</button>
+          <button class="seg" data-metric="ped" onclick="setM12Metric('ped')">Pedidos</button>
+          <button class="seg" data-metric="ticket" onclick="setM12Metric('ticket')">Ticket médio</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-24" id="ads-card">
+      <div class="card-title">ADS — investimento vs. retorno</div>
+      <div class="card-sub">O investimento em mídia foi feito <strong>apenas no Mercado Livre</strong>, então a base é o GMV de ML. Campos em azul são editáveis.</div>
+
+      <div class="ads-highlight">
+        <div>
+          <div class="ads-h-label">Investido em ADS no Mercado Livre — últimos 12 meses</div>
+          <div class="ads-h-value" id="ads-cur-val">R$ —</div>
+          <div class="ads-h-sub" id="ads-cur-sub"></div>
+        </div>
+        <div class="ads-h-badge"><span id="ads-cur-pct">3,31%</span><small>do GMV de ML</small></div>
+      </div>
+
+      <div class="ads-calc">
+        <div class="ads-field"><label>GMV Mercado Livre (12m)</label>
+          <input id="ads-gmv" type="text" inputmode="numeric" oninput="computeAds()"></div>
+        <div class="ads-field"><label>% ADS atual</label>
+          <input id="ads-pct-cur" type="number" step="0.01" value="3.31" oninput="computeAds()"></div>
+        <div class="ads-field hl"><label>% ADS cenário</label>
+          <input id="ads-pct-new" type="number" step="0.01" value="4" oninput="computeAds()"></div>
+        <div class="ads-field hl"><label>ROAS incremental (R$ GMV / R$ ADS)</label>
+          <input id="ads-roas" type="number" step="0.1" value="5" oninput="computeAds()"></div>
+      </div>
+
+      <div class="ads-results" id="ads-results"></div>
+      <div class="ads-note" id="ads-note"></div>
+
+      <div class="card-title" style="margin-top:22px; font-size:12px">Projeção mês a mês</div>
+      <div class="card-sub">GMV real de Mercado Livre por mês e o GMV projetado no cenário definido acima</div>
+      <div style="overflow-x:auto">
+        <table class="summary-table" style="margin-top:6px; min-width:680px">
+          <thead><tr>
+            <th>Mês</th><th>GMV ML</th><th>ADS atual</th><th>ADS cenário</th>
+            <th>+ Investim.</th><th>+ GMV</th><th>GMV ML projetado</th>
+          </tr></thead>
+          <tbody id="m12-ads-monthly"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-title" id="m12-evo-title">Evolução mensal de GMV</div>
+      <div class="card-sub" id="m12-evo-sub"></div>
+      <div class="chart-wrap" style="height:300px"><canvas id="chartEvo" role="img" aria-label="Evolução mensal."></canvas></div>
+    </div>
+
+    <div class="card mb-24">
+      <div class="card-title">Comparativo por trimestre</div>
+      <div class="card-sub">Últimos 12 meses em 4 trimestres de 3 meses · GMV e variação entre trimestres</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="chartQuarter" role="img" aria-label="GMV por trimestre."></canvas></div>
+      <div class="qstrip" id="m12-qstrip"></div>
+    </div>
+
+    <div class="card mb-24">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px">
+        <div>
+          <div class="card-title">Share de GMV por marketplace ao longo do tempo</div>
+          <div class="card-sub">Representatividade de cada canal no GMV, mês a mês</div>
+        </div>
+        <div class="seg-bar" id="m12-share-seg">
+          <button class="seg active" data-share="pct" onclick="setShareMode('pct')">% Share</button>
+          <button class="seg" data-share="abs" onclick="setShareMode('abs')">R$ Absoluto</button>
+        </div>
+      </div>
+      <div id="m12-share-legend" class="legend" style="margin-top:14px"></div>
+      <div class="chart-wrap" style="height:320px"><canvas id="chartShare" role="img" aria-label="Share de GMV por canal."></canvas></div>
+    </div>
+
+    <div class="grid-2 mb-24">
+      <div class="card">
+        <div class="card-title">Ranking de canais — acumulado 12 meses</div>
+        <div class="card-sub">GMV do período, participação e ticket médio por canal</div>
+        <div class="hbar-list" id="m12-channel-rank" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Mudança de share: T1 → T4</div>
+        <div class="card-sub">Quem ganhou e perdeu representatividade do 1º para o 4º trimestre (p.p.)</div>
+        <table class="summary-table" style="margin-top:6px">
+          <thead><tr><th>Canal</th><th>Share T1</th><th>Share T4</th><th>Δ p.p.</th></tr></thead>
+          <tbody id="m12-shift-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Dashboard gerado a partir dos dados do ANYMARKET · Período: maio/2026 · Sellers: King House, Easy House, Ortobom, Oxford, Plasutil
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const GRAND = 39125287;
+const SELLERS_COLORS = {
+  'Easy House': '#D85A30',
+  'King House': '#185FA5',
+  'Ortobom':   '#1D9E75',
+  'Oxford':    '#7F77DD',
+  'Plasutil':  '#E9960A',
+};
+
+const DATA = {
+  easy: { name:'Easy House', gmv:12624111, ped:11991,
+    channels:[
+      {name:'Shopee',          gmv:7499738,  ped:7105,  color:'#E9960A'},
+      {name:'Magazine Luiza',  gmv:2743091,  ped:2744,  color:'#C83264'},
+      {name:'Mercado Livre',   gmv:1967577,  ped:1824,  color:'#185FA5', isML:true},
+      {name:'Cnova',           gmv:198610,   ped:176,   color:'#3B6D11'},
+      {name:'Madeira Madeira', gmv:113409,   ped:77,    color:'#7F77DD'},
+      {name:'Web Continental', gmv:85137,    ped:54,    color:'#636975'},
+      {name:'Zema',            gmv:10583,    ped:7,     color:'#9099AE'},
+      {name:'Amazon',          gmv:3013,     ped:2,     color:'#B4B9C4'},
+      {name:'eFácil',          gmv:2953,     ped:2,     color:'#CDD0D8'},
+    ]},
+  king: { name:'King House', gmv:16751491, ped:8787,
+    channels:[
+      {name:'Shopee',          gmv:6878797,  ped:3541,  color:'#E9960A'},
+      {name:'Mercado Livre',   gmv:5951338,  ped:3066,  color:'#185FA5', isML:true},
+      {name:'Cnova',           gmv:2080126,  ped:1156,  color:'#3B6D11'},
+      {name:'Magazine Luiza',  gmv:1050487,  ped:609,   color:'#C83264'},
+      {name:'Madeira Madeira', gmv:770902,   ped:407,   color:'#7F77DD'},
+      {name:'Amazon',          gmv:13100,    ped:4,     color:'#9099AE'},
+      {name:'Web Continental', gmv:5024,     ped:3,     color:'#B4B9C4'},
+      {name:'Leroy Merlin',    gmv:1717,     ped:1,     color:'#CDD0D8'},
+    ]},
+  ortobom: { name:'Ortobom', gmv:7575940, ped:9151,
+    channels:[
+      {name:'Mercado Livre',   gmv:3166795,  ped:3966,  color:'#185FA5', isML:true},
+      {name:'Magazine Luiza',  gmv:2316887,  ped:2104,  color:'#C83264'},
+      {name:'Shopee',          gmv:967660,   ped:1806,  color:'#E9960A'},
+      {name:'Cnova',           gmv:508692,   ped:571,   color:'#3B6D11'},
+      {name:'Web Continental', gmv:365764,   ped:378,   color:'#636975'},
+      {name:'Shopify',         gmv:126644,   ped:115,   color:'#7F77DD'},
+      {name:'Amazon',          gmv:68873,    ped:163,   color:'#9099AE'},
+      {name:'B2W',             gmv:53643,    ped:47,    color:'#B4B9C4'},
+      {name:'Leroy Merlin',    gmv:982,      ped:1,     color:'#CDD0D8'},
+    ]},
+  oxford: { name:'Oxford', gmv:1644975, ped:5810,
+    channels:[
+      {name:'Mercado Livre',   gmv:863504,   ped:2827,  color:'#185FA5', isML:true},
+      {name:'Shopee',          gmv:700005,   ped:2693,  color:'#E9960A'},
+      {name:'Amazon',          gmv:55327,    ped:227,   color:'#9099AE'},
+      {name:'Magazine Luiza',  gmv:17262,    ped:41,    color:'#C83264'},
+      {name:'Renner',          gmv:5379,     ped:10,    color:'#7F77DD'},
+      {name:'Shopping Livelo', gmv:3498,     ped:12,    color:'#CDD0D8'},
+    ]},
+  plasutil: { name:'Plasutil', gmv:528770, ped:11214,
+    channels:[
+      {name:'Shopee',          gmv:479987,   ped:10476, color:'#E9960A'},
+      {name:'Mercado Livre',   gmv:48712,    ped:735,   color:'#185FA5', isML:true},
+      {name:'TikTok Shop',     gmv:71,       ped:3,     color:'#B4B9C4'},
+    ]},
+};
+
+// ── HELPERS ──
+function fmt(n){
+  if(n>=1e6) return 'R$ '+(n/1e6).toFixed(1)+'M';
+  if(n>=1e3) return 'R$ '+(n/1e3).toFixed(0)+'K';
+  return 'R$ '+Math.round(n).toLocaleString('pt-BR');
+}
+function fmtFull(n){ return 'R$ '+Math.round(n).toLocaleString('pt-BR'); }
+function fmtN(n){ return Math.round(n).toLocaleString('pt-BR'); }
+function pct(a,b){ return b ? ((a/b)*100).toFixed(1)+'%' : '—'; }
+function pctNum(a,b){ return b ? (a/b)*100 : 0; }
+function deltaHtml(val){
+  if(val===null||val===undefined) return '<span style="color:#9099AE">—</span>';
+  const s = val>=0?'+':'';
+  const cls = val>=0?'delta-pos':'delta-neg';
+  return `<span class="${cls}">${s}${(val*100).toFixed(1)}%</span>`;
+}
+function rankBadge(n){
+  const cls = n===1?'rank-1':n===2?'rank-2':'rank-3';
+  const emoji = n===1?'🥇':n===2?'🥈':'🥉';
+  if(n>3) return '';
+  return `<span class="rank-badge ${cls}">${emoji} ${n}º</span>`;
+}
+function getML(key){ return DATA[key].channels.find(c=>c.isML)||{gmv:0,ped:0}; }
+function getChVal(key,name){ const c=DATA[key].channels.find(c=>c.name===name); return c?c.gmv:0; }
+function getOthers(key){
+  const names=['Mercado Livre','Shopee','Magazine Luiza','Cnova','Madeira Madeira'];
+  return DATA[key].gmv - names.reduce((s,n)=>s+getChVal(key,n),0);
+}
+
+// ── CHARTS refs ──
+let charts = {};
+function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+
+// ── VIEW-ALL charts ──
+function buildAllCharts(){
+  destroyChart('stacked'); destroyChart('mlpct'); destroyChart('chrank');
+
+  const keys = ['easy','king','ortobom','oxford','plasutil'];
+  const labels = keys.map(k=>DATA[k].name);
+
+  // Stacked bar
+  charts['stacked'] = new Chart(document.getElementById('chartStacked'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Mercado Livre', data:keys.map(k=>getML(k).gmv),      backgroundColor:'#185FA5', borderSkipped:false, borderRadius:2},
+        {label:'Shopee',        data:keys.map(k=>getChVal(k,'Shopee')),backgroundColor:'#E9960A', borderSkipped:false},
+        {label:'Magazine Luiza',data:keys.map(k=>getChVal(k,'Magazine Luiza')),backgroundColor:'#C83264', borderSkipped:false},
+        {label:'Cnova',         data:keys.map(k=>getChVal(k,'Cnova')),backgroundColor:'#3B6D11', borderSkipped:false},
+        {label:'Madeira Madeira',data:keys.map(k=>getChVal(k,'Madeira Madeira')),backgroundColor:'#7F77DD', borderSkipped:false},
+        {label:'Outros',        data:keys.map(getOthers),             backgroundColor:'#CDD0D8', borderSkipped:false},
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmtFull(ctx.raw)}}},
+      scales:{
+        x:{stacked:true, grid:{display:false}, ticks:{font:{size:11}}},
+        y:{stacked:true, ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v+'',font:{size:10}}, grid:{color:'rgba(0,0,0,.05)'}}
+      }
+    }
+  });
+
+  // ML % bar
+  charts['mlpct'] = new Chart(document.getElementById('chartMLPct'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:'% ML',
+        data:keys.map(k=>+pctNum(getML(k).gmv,DATA[k].gmv).toFixed(1)),
+        backgroundColor:keys.map(k=>{
+          const p=pctNum(getML(k).gmv,DATA[k].gmv);
+          return p>=40?'#F4B400':p>=25?'#FFC400':'#FFDA63';
+        }),
+        borderRadius:6, borderSkipped:false,
+      }]
+    },
+    plugins:[ mlPctLabels ],
+    options:{
+      indexAxis:'y',
+      layout:{ padding:{ right:40 } },
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>' '+ctx.raw.toFixed(1)+'%'}}
+      },
+      scales:{
+        x:{max:60, ticks:{callback:v=>v+'%',font:{size:10}}, grid:{color:'rgba(0,0,0,.05)'}},
+        y:{grid:{display:false}, ticks:{font:{size:11}}}
+      }
+    }
+  });
+
+  // Channel rank
+  const chAgg = {}; CHANNEL_AGG = chAgg;
+  Object.values(DATA).forEach(d=>d.channels.forEach(c=>{
+    if(!chAgg[c.name]) chAgg[c.name]={gmv:0,color:c.color};
+    chAgg[c.name].gmv+=c.gmv;
+  }));
+  const sorted = Object.entries(chAgg).sort((a,b)=>b[1].gmv-a[1].gmv).slice(0,8);
+  charts['chrank'] = new Chart(document.getElementById('chartChannelRank'),{
+    type:'bar',
+    data:{
+      labels:sorted.map(x=>x[0]),
+      datasets:[{
+        label:'GMV',
+        data:sorted.map(x=>x[1].gmv),
+        backgroundColor:sorted.map(x=>x[1].color),
+        borderRadius:5,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmtFull(ctx.raw)}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v+'',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}
+      }
+    }
+  });
+
+  initChannelCompare();
+
+  // Summary table
+  const keys2 = ['easy','king','ortobom','oxford','plasutil'];
+  const tbody = document.getElementById('summary-tbody');
+  const rows = keys2.map(k=>{
+    const d=DATA[k]; const ml=getML(k);
+    const mlPct = pctNum(ml.gmv,d.gmv);
+    const rank = d.channels.findIndex(c=>c.isML)+1;
+    const topCh = d.channels[0];
+    return {k,d,ml,mlPct,rank,topCh};
+  });
+  tbody.innerHTML = rows.map(({k,d,ml,mlPct,rank,topCh})=>`
+    <tr>
+      <td><span class="seller-dot" style="background:${SELLERS_COLORS[d.name]}"></span><strong>${d.name}</strong></td>
+      <td>${fmtFull(d.gmv)}</td>
+      <td>${fmtN(d.ped)}</td>
+      <td>R$ ${Math.round(d.gmv/d.ped).toLocaleString('pt-BR')}</td>
+      <td>${fmtFull(ml.gmv)}</td>
+      <td><strong>${mlPct.toFixed(1)}%</strong></td>
+      <td>${pctNum(d.gmv,GRAND).toFixed(1)}%</td>
+      <td>${topCh.name}</td>
+      <td>${rankBadge(rank)} ${rank}º lugar</td>
+    </tr>
+  `).join('')+`
+    <tr class="total-row">
+      <td>TOTAL</td>
+      <td>${fmtFull(GRAND)}</td>
+      <td>${fmtN(46953)}</td>
+      <td>R$ 833</td>
+      <td>${fmtFull(11997926)}</td>
+      <td><strong>30,7%</strong></td>
+      <td>100%</td>
+      <td>—</td>
+      <td>—</td>
+    </tr>`;
+}
+
+// ── VIEW-SELLER charts ──
+function buildSellerView(key){
+  ['donut','mlvsgmv','mlvsped'].forEach(id=>destroyChart(id));
+  const d = DATA[key];
+  const ml = getML(key);
+  const outros_gmv = d.gmv - ml.gmv;
+  const outros_ped = d.ped - ml.ped;
+
+  // KPIs
+  document.getElementById('seller-kpis').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">GMV Total</div>
+      <div class="kpi-value">${fmt(d.gmv)}</div>
+      <div class="kpi-sub">${pctNum(d.gmv,GRAND).toFixed(1)}% do total</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Pedidos</div>
+      <div class="kpi-value">${fmtN(d.ped)}</div>
+      <div class="kpi-sub">Ticket: R$ ${Math.round(d.gmv/d.ped).toLocaleString('pt-BR')}</div>
+    </div>
+    <div class="kpi-card highlight">
+      <div class="kpi-label">GMV Mercado Livre</div>
+      <div class="kpi-value">${fmt(ml.gmv)}</div>
+      <div class="kpi-sub">${pctNum(ml.gmv,d.gmv).toFixed(1)}% do seller</div>
+    </div>
+    <div class="kpi-card highlight">
+      <div class="kpi-label">Pedidos Mercado Livre</div>
+      <div class="kpi-value">${fmtN(ml.ped)}</div>
+      <div class="kpi-sub">Ticket ML: R$ ${Math.round(ml.gmv/ml.ped).toLocaleString('pt-BR')}</div>
+    </div>
+  `;
+
+  // Donut
+  document.getElementById('donut-title').textContent = d.name+' — GMV por canal';
+  document.getElementById('donut-sub').textContent   = fmtFull(d.gmv)+' total · '+fmtN(d.ped)+' pedidos';
+  const topChs = d.channels.slice(0,5);
+  const otherGMV = d.channels.slice(5).reduce((s,c)=>s+c.gmv,0);
+  const dData   = [...topChs.map(c=>c.gmv), ...(otherGMV>0?[otherGMV]:[])];
+  const dLabels = [...topChs.map(c=>c.name), ...(otherGMV>0?['Outros']:[])];
+  const dColors = [...topChs.map(c=>c.color), ...(otherGMV>0?['#CDD0D8']:[])];
+
+  document.getElementById('donut-legend').innerHTML = dLabels.map((l,i)=>
+    `<span class="legend-item"><span class="legend-sq" style="background:${dColors[i]}"></span>${l} ${pctNum(dData[i],d.gmv).toFixed(0)}%</span>`
+  ).join('');
+
+  charts['donut'] = new Chart(document.getElementById('chartDonut'),{
+    type:'doughnut',
+    data:{labels:dLabels, datasets:[{data:dData, backgroundColor:dColors, borderWidth:2, borderColor:'#fff'}]},
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'64%',
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+fmtFull(ctx.raw)+' ('+pct(ctx.raw,d.gmv)+')'}}
+      }
+    }
+  });
+
+  // HBars
+  const maxGMV = d.channels[0].gmv;
+  document.getElementById('hbar-channels').innerHTML = d.channels.map(ch=>{
+    const w = (ch.gmv/maxGMV*100).toFixed(1);
+    const mlBadge = ch.isML?'<span class="badge-ml">ML</span>':'';
+    return `<div class="hbar-row">
+      <div class="hbar-name">${ch.name}${mlBadge}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${w}%;background:${ch.color}">${w>15?pct(ch.gmv,d.gmv):''}</div></div>
+      <div class="hbar-val">${fmt(ch.gmv)}</div>
+      <div class="hbar-pct">${pct(ch.gmv,d.gmv)}</div>
+    </div>`;
+  }).join('');
+
+  // ML compare table
+  const mlGMV = ml.gmv, mlPed = ml.ped, mlTk = ml.gmv/ml.ped;
+  document.getElementById('ml-compare-body').innerHTML = d.channels.map((ch,i)=>{
+    const isML = ch.isML;
+    const tk = ch.gmv/ch.ped;
+    const vsGMV = isML?null:(ml.gmv?((ch.gmv-ml.gmv)/ml.gmv):null);
+    const vsPed = isML?null:(ml.ped?((ch.ped-ml.ped)/ml.ped):null);
+    const vsTk  = isML?null:(mlTk?((tk-mlTk)/mlTk):null);
+    const rowCls = isML?'is-ml':'';
+    return `<tr class="${rowCls}">
+      <td>${rankBadge(i+1)} ${ch.name}${isML?'<span class="badge-ml">ML</span>':''}</td>
+      <td>${fmtFull(ch.gmv)}</td>
+      <td>${pct(ch.gmv,d.gmv)}</td>
+      <td>${fmtN(ch.ped)}</td>
+      <td>R$ ${Math.round(tk).toLocaleString('pt-BR')}</td>
+      <td>${isML?'<span style="color:#9099AE">base</span>':deltaHtml(vsGMV)}</td>
+      <td>${isML?'<span style="color:#9099AE">base</span>':deltaHtml(vsPed)}</td>
+      <td>${isML?'<span style="color:#9099AE">base</span>':deltaHtml(vsTk)}</td>
+    </tr>`;
+  }).join('');
+
+  // ML vs Outros charts
+  charts['mlvsgmv'] = new Chart(document.getElementById('chartMLvsGMV'),{
+    type:'bar',
+    data:{
+      labels:['Mercado Livre','Outros canais'],
+      datasets:[{
+        label:'GMV',
+        data:[ml.gmv, outros_gmv],
+        backgroundColor:['#185FA5','#CDD0D8'],
+        borderRadius:6,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>' '+fmtFull(ctx.raw)+' ('+pct(ctx.raw,d.gmv)+')'}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v+'',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}
+      }
+    }
+  });
+  charts['mlvsped'] = new Chart(document.getElementById('chartMLvsPed'),{
+    type:'bar',
+    data:{
+      labels:['Mercado Livre','Outros canais'],
+      datasets:[{
+        label:'Pedidos',
+        data:[ml.ped, outros_ped],
+        backgroundColor:['#185FA5','#CDD0D8'],
+        borderRadius:6,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>' '+fmtN(ctx.raw)+' pedidos ('+pct(ctx.raw,d.ped)+')'}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{ticks:{callback:v=>v>=1e3?(v/1e3).toFixed(0)+'K':v+'',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}
+      }
+    }
+  });
+}
+
+// ── VIEW SWITCHER ──
+let currentView = 'all';
+function setView(key){
+  currentView = key;
+  // Update insight cards
+  document.querySelectorAll('.insight-card').forEach(c=>c.classList.remove('active'));
+  const insEl = document.getElementById('ins-'+(key==='all'?'all':key));
+  if(insEl) insEl.classList.add('active');
+
+  if(key==='all'){
+    document.getElementById('view-all').style.display='';
+    document.getElementById('view-seller').style.display='none';
+    buildAllCharts();
+  } else {
+    document.getElementById('view-all').style.display='none';
+    document.getElementById('view-seller').style.display='';
+    buildSellerView(key);
+  }
+}
+
+// Extra insight card for Plasutil (not in the 5-col grid) — add to seller tab
+const insightGrid = document.querySelector('.insight-grid');
+const plasCard = document.createElement('div');
+plasCard.className='insight-card';
+plasCard.id='ins-plasutil';
+plasCard.onclick=()=>setView('plasutil');
+plasCard.innerHTML=`
+  <div class="insight-name">Plasutil</div>
+  <div class="insight-pct" style="color:#E9960A">9,2%</div>
+  <div class="insight-sub">ML no GMV — 2º canal</div>
+  <div class="pct-bar"><div class="pct-fill" style="width:9.2%;background:#E9960A"></div></div>
+`;
+insightGrid.appendChild(plasCard);
+
+const M12_MONTH_LABELS = ["jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26"];
+const MONTHLY = {"ortobom": [{"name": "Mercado Livre", "color": "#185FA5", "isML": true, "gmv": [4445643, 3073030, 2633756, 3317491, 3548013, 5856907, 3639625, 4148761, 2078650, 3643496, 1872938, 3158570], "ped": [7360, 4685, 3687, 5057, 4793, 7089, 4921, 5091, 2671, 4901, 2435, 3950]}, {"name": "Magazine Luiza", "color": "#C83264", "isML": false, "gmv": [2027526, 453263, 1367731, 1511773, 1580859, 2901529, 1906782, 1838284, 797617, 1241047, 813151, 2314907], "ped": [2380, 501, 1567, 1498, 1547, 2550, 1825, 1835, 805, 1230, 771, 2102]}, {"name": "Shopee", "color": "#E9960A", "isML": false, "gmv": [0, 3720, 24681, 144346, 406327, 935169, 938987, 1133625, 847977, 1035497, 808187, 921613], "ped": [0, 6, 41, 264, 617, 1409, 1435, 1673, 1223, 1451, 1106, 1224]}, {"name": "Cnova", "color": "#3B6D11", "isML": false, "gmv": [798067, 354040, 340835, 505952, 444980, 715239, 377478, 587379, 502860, 334501, 373786, 508689], "ped": [1263, 499, 499, 721, 586, 1138, 515, 895, 738, 451, 421, 571]}, {"name": "Amazon", "color": "#9099AE", "isML": false, "gmv": [73770, 41346, 23515, 31936, 22125, 316858, 155927, 36159, 82730, 94287, 58531, 68327], "ped": [226, 103, 61, 83, 56, 483, 260, 67, 131, 138, 86, 162]}, {"name": "Shopify", "color": "#2AA9A0", "isML": false, "gmv": [0, 0, 0, 0, 0, 0, 13153, 157536, 223527, 282663, 188963, 126644], "ped": [0, 0, 0, 0, 0, 0, 15, 160, 193, 246, 160, 115]}, {"name": "B2W", "color": "#B4B9C4", "isML": false, "gmv": [78118, 78489, 24357, 37300, 69093, 131875, 136054, 62377, 33706, 40891, 14259, 53642], "ped": [105, 101, 26, 54, 93, 156, 138, 60, 40, 40, 20, 47]}, {"name": "Web Continental", "color": "#636975", "isML": false, "gmv": [0, 0, 1108, 13139, 28190, 46662, 63708, 50294, 29196, 38822, 41516, 362583], "ped": [0, 0, 2, 18, 24, 56, 97, 80, 50, 60, 48, 375]}]};
+const STORE_NAMES = {"ortobom": "Ortobom"};
+
+if (window.Chart) {
+  Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = '#7A8AA6';
+  Chart.defaults.borderColor = 'rgba(15,27,45,.06)';
+  Chart.defaults.plugins.legend.display = false;
+  Chart.defaults.plugins.tooltip.backgroundColor = '#0F1B2D';
+  Chart.defaults.plugins.tooltip.padding = 11;
+  Chart.defaults.plugins.tooltip.cornerRadius = 9;
+  Chart.defaults.plugins.tooltip.titleColor = '#fff';
+  Chart.defaults.plugins.tooltip.bodyColor = 'rgba(255,255,255,.85)';
+  Chart.defaults.plugins.tooltip.titleFont = { family:"'Space Grotesk', sans-serif", weight:'600', size:12 };
+  Chart.defaults.plugins.tooltip.boxPadding = 5;
+  Chart.defaults.plugins.tooltip.displayColors = true;
+  Chart.defaults.plugins.tooltip.usePointStyle = true;
+}
+
+// rótulos de % no gráfico "% de ML em cada seller" (amarelo ML)
+const mlPctLabels = { id:'mlPctLabels',
+  afterDatasetsDraw(chart){ const ctx=chart.ctx, meta=chart.getDatasetMeta(0);
+    ctx.save(); ctx.font="600 11px 'Space Grotesk', sans-serif"; ctx.fillStyle='#0F1B2D'; ctx.textBaseline='middle';
+    meta.data.forEach((bar,i)=>{ const v=chart.data.datasets[0].data[i]; ctx.textAlign='left';
+      ctx.fillText((v).toFixed(1).replace('.',',')+'%', bar.x+7, bar.y); }); ctx.restore(); } };
+
+// comparação de canais (ranking consolidado)
+let CHANNEL_AGG = {};
+function initChannelCompare(){
+  const a=document.getElementById('cmp-a'), b=document.getElementById('cmp-b');
+  if(!a||!b) return;
+  const names=Object.keys(CHANNEL_AGG).sort((x,y)=>CHANNEL_AGG[y].gmv-CHANNEL_AGG[x].gmv);
+  const opt=names.map(n=>`<option>${n}</option>`).join('');
+  a.innerHTML=opt; b.innerHTML=opt;
+  a.value=names.includes('Mercado Livre')?'Mercado Livre':names[0];
+  b.value=names.includes('Shopee')?'Shopee':(names[1]||names[0]);
+  a.onchange=b.onchange=renderChannelCompare;
+  renderChannelCompare();
+}
+function renderChannelCompare(){
+  const an=document.getElementById('cmp-a').value, bn=document.getElementById('cmp-b').value;
+  const ga=CHANNEL_AGG[an]?CHANNEL_AGG[an].gmv:0, gb=CHANNEL_AGG[bn]?CHANNEL_AGG[bn].gmv:0;
+  const big=ga>=gb, diff=gb?(ga-gb)/gb*100:0;
+  const ca=CHANNEL_AGG[an]?CHANNEL_AGG[an].color:'#999', cb=CHANNEL_AGG[bn]?CHANNEL_AGG[bn].color:'#999';
+  document.getElementById('cmp-result').innerHTML=
+    `<span class="seller-dot" style="background:${ca}"></span><strong>${an}</strong> ${fmtFull(ga)}　·　`+
+    `<span class="seller-dot" style="background:${cb}"></span><strong>${bn}</strong> ${fmtFull(gb)}　→　`+
+    `${an} é <span class="${big?'delta-pos':'delta-neg'}">${big?'+':''}${diff.toFixed(1).replace('.',',')}%</span> ${big?'maior':'menor'} que ${bn}`;
+}
+const N = M12_MONTH_LABELS.length;
+const QN = Math.min(12, N), QSTART = N - QN, NQ = Math.floor(QN/3);
+const OUTROS_COLOR = '#CDD0D8';
+const M12 = { seller:null, metric:'gmv', share:'pct' };
+(function(){ const ks=Object.keys(MONTHLY); M12.seller = ks.length>1?'all':ks[0]; })();
+
+function qLabelShort(q){ return 'T'+(q+1); }
+function qLabelFull(q){ const a=M12_MONTH_LABELS[QSTART+q*3], b=M12_MONTH_LABELS[QSTART+q*3+2];
+  return 'T'+(q+1)+' · '+a.split('/')[0]+'–'+b; }
+function qSum(arr,q){ let s=0; for(let i=0;i<3;i++) s+=arr[QSTART+q*3+i]; return s; }
+function sum(a){ return a.reduce((s,x)=>s+x,0); }
+
+function m12Agg(sellerKey){
+  const map={};
+  const keys = sellerKey==='all' ? Object.keys(MONTHLY) : [sellerKey];
+  keys.forEach(k=>MONTHLY[k].forEach(ch=>{
+    if(!map[ch.name]) map[ch.name]={name:ch.name,color:ch.color,isML:ch.isML,gmv:Array(N).fill(0),ped:Array(N).fill(0)};
+    for(let i=0;i<N;i++){ map[ch.name].gmv[i]+=ch.gmv[i]; map[ch.name].ped[i]+=ch.ped[i]; }
+  }));
+  const channels=Object.values(map);
+  const totalGmv=Array(N).fill(0), totalPed=Array(N).fill(0);
+  channels.forEach(ch=>{ for(let i=0;i<N;i++){ totalGmv[i]+=ch.gmv[i]; totalPed[i]+=ch.ped[i]; } });
+  channels.sort((a,b)=> sum(b.gmv)-sum(a.gmv));
+  return {channels,totalGmv,totalPed};
+}
+
+function buildM12Seller(){
+  const ks=Object.keys(MONTHLY);
+  const opts = ks.length>1 ? [['all','Todos'],...ks.map(k=>[k,STORE_NAMES[k]||k])] : ks.map(k=>[k,STORE_NAMES[k]||k]);
+  document.getElementById('m12-seller-seg').innerHTML = opts.map(([k,l])=>
+    `<button class="seg ${k===M12.seller?'active':''}" onclick="setM12Seller('${k}')">${l}</button>`).join('');
+}
+
+function buildM12(){
+  buildM12Seller();
+  const A=m12Agg(M12.seller);
+  buildKpis(A); buildEvo(A); buildQuarter(A); buildShare(A); buildRank(A); buildShift(A); initAds(A);
+}
+
+function buildKpis(A){
+  const gmvT=sum(A.totalGmv), pedT=sum(A.totalPed), tk=pedT?gmvT/pedT:0;
+  let bi=0; for(let i=1;i<N;i++) if(A.totalGmv[i]>A.totalGmv[bi]) bi=i;
+  const ml=A.channels.find(c=>c.isML); const mlShare=gmvT?sum(ml.gmv)/gmvT*100:0;
+  document.getElementById('m12-kpis').innerHTML=`
+    <div class="kpi-card"><div class="kpi-label">GMV — ${N} meses</div>
+      <div class="kpi-value">${fmt(gmvT)}</div><div class="kpi-sub">melhor mês: ${M12_MONTH_LABELS[bi]} (${fmt(A.totalGmv[bi])})</div></div>
+    <div class="kpi-card"><div class="kpi-label">GMV médio mensal</div>
+      <div class="kpi-value">${fmt(gmvT/N)}</div><div class="kpi-sub">média dos ${N} meses</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pedidos — ${N} meses</div>
+      <div class="kpi-value">${fmtN(pedT)}</div><div class="kpi-sub">${fmtN(pedT/N)} / mês em média</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ticket Médio</div>
+      <div class="kpi-value">R$ ${Math.round(tk).toLocaleString('pt-BR')}</div><div class="kpi-sub">GMV ÷ pedidos no período</div></div>
+    <div class="kpi-card highlight"><div class="kpi-label">Share Mercado Livre</div>
+      <div class="kpi-value">${mlShare.toFixed(1)}%</div><div class="kpi-sub">do GMV no período</div></div>`;
+}
+
+function metricSeries(A){
+  if(M12.metric==='gmv')  return {data:A.totalGmv.slice(),title:'Evolução mensal de GMV',tip:v=>fmtFull(v)};
+  if(M12.metric==='ped')  return {data:A.totalPed.slice(),title:'Evolução mensal de pedidos',tip:v=>fmtN(v)+' pedidos'};
+  return {data:A.totalGmv.map((g,i)=>A.totalPed[i]?g/A.totalPed[i]:0),title:'Evolução mensal do ticket médio',tip:v=>'R$ '+Math.round(v).toLocaleString('pt-BR')};
+}
+function buildEvo(A){
+  destroyChart('evo'); const M=metricSeries(A);
+  document.getElementById('m12-evo-title').textContent=M.title;
+  document.getElementById('m12-evo-sub').textContent=M12_MONTH_LABELS[0]+' a '+M12_MONTH_LABELS[N-1]+' · '+(STORE_NAMES[M12.seller]||'Todos os sellers');
+  charts['evo']=new Chart(document.getElementById('chartEvo'),{type:'line',
+    data:{labels:M12_MONTH_LABELS,datasets:[{data:M.data,borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,.12)',
+      fill:true,tension:.32,borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#185FA5',pointHoverRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+M.tip(c.raw),
+        afterLabel:c=>{const i=c.dataIndex;if(!i)return'';const p=M.data[i-1];if(!p)return'';const d=(c.raw-p)/p*100;return ' m/m: '+(d>=0?'+':'')+d.toFixed(1)+'%';}}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{beginAtZero:M12.metric!=='ticket',ticks:{callback:v=>M12.metric==='gmv'?(v>=1e6?(v/1e6).toFixed(0)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v):(v>=1e3?(v/1e3).toFixed(0)+'K':v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}}}});
+}
+
+function buildQuarter(A){
+  destroyChart('quarter');
+  const qv=[]; for(let q=0;q<NQ;q++) qv.push(qSum(A.totalGmv,q));
+  const sh=['#85B7EB','#5197D9','#2E78C0','#185FA5'];
+  charts['quarter']=new Chart(document.getElementById('chartQuarter'),{type:'bar',
+    data:{labels:qv.map((_,q)=>qLabelShort(q)),datasets:[{data:qv,backgroundColor:qv.map((_,q)=>sh[q%4]),borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtFull(c.raw),
+        afterLabel:c=>{const i=c.dataIndex;if(!i)return'';const p=qv[i-1];if(!p)return'';const d=(c.raw-p)/p*100;return ' vs T'+i+': '+(d>=0?'+':'')+d.toFixed(1)+'%';}}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:12,weight:'600'}}},
+        y:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v,font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}}}});
+  document.getElementById('m12-qstrip').innerHTML=qv.map((v,i)=>{
+    let d='<span style="color:var(--text3)">trimestre base</span>';
+    if(i>0&&qv[i-1]){const p=(v-qv[i-1])/qv[i-1]*100;d=`<span class="${p>=0?'delta-pos':'delta-neg'}">${p>=0?'+':''}${p.toFixed(1)}% vs T${i}</span>`;}
+    return `<div class="qcell"><div class="q-name">${qLabelFull(i)}</div><div class="q-val">${fmt(v)}</div><div class="q-delta">${d}</div></div>`;
+  }).join('');
+}
+
+function shareGroups(A){
+  const top=A.channels.slice(0,6).map(c=>({name:c.name,color:c.color,gmv:c.gmv.slice()}));
+  if(A.channels.length>6){const o={name:'Outros',color:OUTROS_COLOR,gmv:Array(N).fill(0)};
+    A.channels.slice(6).forEach(c=>{for(let i=0;i<N;i++)o.gmv[i]+=c.gmv[i];});top.push(o);}
+  return top;
+}
+function buildShare(A){
+  destroyChart('share'); const groups=shareGroups(A); const isPct=M12.share==='pct';
+  const datasets=groups.map(g=>({label:g.name,
+    data:g.gmv.map((v,i)=>isPct?(A.totalGmv[i]?v/A.totalGmv[i]*100:0):v),
+    backgroundColor:g.color+'D9',borderColor:g.color,borderWidth:1,fill:true,tension:.25,pointRadius:0}));
+  charts['share']=new Chart(document.getElementById('chartShare'),{type:'line',
+    data:{labels:M12_MONTH_LABELS,datasets},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+(isPct?c.raw.toFixed(1)+'%':fmtFull(c.raw))}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}},
+        y:{stacked:true,max:isPct?100:undefined,ticks:{callback:v=>isPct?v+'%':(v>=1e6?(v/1e6).toFixed(0)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}}}});
+  document.getElementById('m12-share-legend').innerHTML=groups.map(g=>
+    `<span class="legend-item"><span class="legend-sq" style="background:${g.color}"></span>${g.name}</span>`).join('');
+}
+
+function buildRank(A){
+  const tot=A.channels.map(c=>({name:c.name,color:c.color,isML:c.isML,gmv:sum(c.gmv),ped:sum(c.ped)}));
+  const grand=tot.reduce((s,c)=>s+c.gmv,0); const maxv=tot[0]?tot[0].gmv:1;
+  document.getElementById('m12-channel-rank').innerHTML=tot.slice(0,8).map(c=>{
+    const w=(c.gmv/maxv*100).toFixed(1), share=grand?c.gmv/grand*100:0, tk=c.ped?c.gmv/c.ped:0;
+    return `<div class="hbar-row">
+      <div class="hbar-name">${c.name}${c.isML?'<span class="badge-ml">ML</span>':''}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${w}%;background:${c.color}">${w>16?share.toFixed(0)+'%':''}</div></div>
+      <div class="hbar-val">${fmt(c.gmv)}</div>
+      <div class="hbar-pct">R$ ${Math.round(tk).toLocaleString('pt-BR')}</div>
+    </div>`;}).join('');
+}
+
+function buildShift(A){
+  const t1=qSum(A.totalGmv,0), t4=qSum(A.totalGmv,NQ-1);
+  const rows=A.channels.map(c=>{const s1=t1?qSum(c.gmv,0)/t1*100:0,s4=t4?qSum(c.gmv,NQ-1)/t4*100:0;
+    return {name:c.name,isML:c.isML,s1,s4,d:s4-s1};}).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d)).slice(0,8);
+  document.getElementById('m12-shift-body').innerHTML=rows.map(r=>
+    `<tr><td>${r.name}${r.isML?'<span class="badge-ml">ML</span>':''}</td>
+      <td>${r.s1.toFixed(1)}%</td><td>${r.s4.toFixed(1)}%</td>
+      <td class="${r.d>=0?'delta-pos':'delta-neg'}">${r.d>=0?'+':''}${r.d.toFixed(1)} p.p.</td></tr>`).join('');
+}
+
+function setM12Seller(k){ M12.seller=k; buildM12(); }
+function setM12Metric(m){ M12.metric=m;
+  document.querySelectorAll('#m12-metric-seg .seg').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(m==='ped'?'pedidos':m==='ticket'?'ticket':'gmv')));
+  buildEvo(m12Agg(M12.seller)); }
+function setShareMode(s){ M12.share=s;
+  document.querySelectorAll('#m12-share-seg .seg').forEach(b=>b.classList.toggle('active',(s==='pct')===b.textContent.includes('%')));
+  buildShare(m12Agg(M12.seller)); }
+
+// ── ADS simulator ──
+let ADS_ML12 = 0, ADS_TOT12 = 0, ADS_ML_SERIES = [];
+function last12sum(arr){ const s=Math.max(0,N-12); let g=0; for(let i=s;i<N;i++) g+=arr[i]; return g; }
+function fmtBR(n){ return Math.round(n).toLocaleString('pt-BR'); }
+function parseBR(v){ return parseFloat(String(v).replace(/[^\d]/g,''))||0; }
+function pctBR(v){ return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:2}); }
+function initAds(A){
+  const ml=A.channels.find(c=>c.isML);
+  ADS_ML12 = ml? last12sum(ml.gmv):0;
+  ADS_TOT12 = last12sum(A.totalGmv);
+  const s=Math.max(0,N-12); ADS_ML_SERIES=[];
+  for(let i=s;i<N;i++) ADS_ML_SERIES.push({label:M12_MONTH_LABELS[i], gmv: ml? ml.gmv[i]:0});
+  document.getElementById('ads-gmv').value = fmtBR(ADS_ML12);
+  computeAds();
+}
+function computeAds(){
+  const gmv=parseBR(document.getElementById('ads-gmv').value);
+  const pc=parseFloat(document.getElementById('ads-pct-cur').value)||0;
+  const pn=parseFloat(document.getElementById('ads-pct-new').value)||0;
+  const roas=parseFloat(document.getElementById('ads-roas').value)||0;
+  const invCur=gmv*pc/100, invNew=gmv*pn/100, invAdd=gmv*(pn-pc)/100;
+  const gmvAdd=invAdd*roas, mlProj=gmv+gmvAdd;
+  const other=Math.max(0, ADS_TOT12-ADS_ML12);
+  const totNow=other+gmv, totProj=other+mlProj;
+  const shareNow=totNow?gmv/totNow*100:0, shareProj=totProj?mlProj/totProj*100:0;
+  const newTacos=mlProj?invNew/mlProj*100:0;
+  const propRoas=pc?(1/(pc/100)):0;
+  document.getElementById('ads-cur-val').textContent='R$ '+fmtBR(invCur);
+  document.getElementById('ads-cur-sub').textContent='≈ R$ '+fmtBR(invCur/12)+' / mês · sobre o GMV de Mercado Livre (R$ '+fmtBR(gmv)+' em 12m)';
+  document.getElementById('ads-cur-pct').textContent=pctBR(pc)+'%';
+  document.getElementById('ads-results').innerHTML=`
+    <div class="ads-cell"><div class="ac-label">Investimento ADS em ML — cenário ${pctBR(pn)}%</div>
+      <div class="ac-value">R$ ${fmtBR(invNew)}</div><div class="ac-sub">no período (sobre o GMV de ML)</div></div>
+    <div class="ads-cell"><div class="ac-label">Investimento adicional</div>
+      <div class="ac-value">R$ ${fmtBR(invAdd)}</div><div class="ac-sub">vs. ${pctBR(pc)}% atual</div></div>
+    <div class="ads-cell proj"><div class="ac-label">GMV de ML projetado</div>
+      <div class="ac-value">R$ ${fmtBR(mlProj)}</div><div class="ac-sub">+R$ ${fmtBR(gmvAdd)} de GMV adicional</div></div>`;
+  document.getElementById('ads-note').innerHTML=
+    `ADS aplicado só no Mercado Livre: GMV de ML projetado = GMV de ML + (investimento adicional × ROAS incremental) = R$ ${fmtBR(gmv)} + (R$ ${fmtBR(invAdd)} × ${pctBR(roas)}) = R$ ${fmtBR(mlProj)}. `+
+    `Com isso o GMV total da loja iria de R$ ${fmtBR(totNow)} para R$ ${fmtBR(totProj)}, e o share do ML de ${pctBR(shareNow)}% para ${pctBR(shareProj)}%. TACoS efetivo em ML: ${pctBR(newTacos)}%. `+
+    `O <strong>ROAS incremental</strong> é a premissa-chave — troque pelo valor real do seller. Referência: o modelo proporcional implicaria ROAS ≈ ${pctBR(propRoas)}× (quase sempre otimista).`;
+  // projeção mês a mês (GMV real de ML por mês × cenário)
+  let tReal=0,tCur=0,tNew=0,tInv=0,tAdd=0,tProj=0;
+  const body=ADS_ML_SERIES.map(m=>{
+    const aCur=m.gmv*pc/100,aNew=m.gmv*pn/100,iAdd=m.gmv*(pn-pc)/100,gAdd=iAdd*roas,proj=m.gmv+gAdd;
+    tReal+=m.gmv;tCur+=aCur;tNew+=aNew;tInv+=iAdd;tAdd+=gAdd;tProj+=proj;
+    return `<tr><td>${m.label}</td><td>R$ ${fmtBR(m.gmv)}</td><td>R$ ${fmtBR(aCur)}</td><td>R$ ${fmtBR(aNew)}</td><td>R$ ${fmtBR(iAdd)}</td><td class="delta-pos">+R$ ${fmtBR(gAdd)}</td><td><strong>R$ ${fmtBR(proj)}</strong></td></tr>`;
+  }).join('');
+  const nM=ADS_ML_SERIES.length||1;
+  const media=`<tr style="background:var(--blue-light)"><td><strong>Média/mês</strong></td><td><strong>R$ ${fmtBR(tReal/nM)}</strong></td><td>R$ ${fmtBR(tCur/nM)}</td><td>R$ ${fmtBR(tNew/nM)}</td><td>R$ ${fmtBR(tInv/nM)}</td><td class="delta-pos">+R$ ${fmtBR(tAdd/nM)}</td><td><strong>R$ ${fmtBR(tProj/nM)}</strong></td></tr>`;
+  const total=`<tr class="total-row"><td>Total 12m</td><td>R$ ${fmtBR(tReal)}</td><td>R$ ${fmtBR(tCur)}</td><td>R$ ${fmtBR(tNew)}</td><td>R$ ${fmtBR(tInv)}</td><td>+R$ ${fmtBR(tAdd)}</td><td>R$ ${fmtBR(tProj)}</td></tr>`;
+  document.getElementById('m12-ads-monthly').innerHTML=body+media+total;
+}
+
+function setMode(mode){
+  const monthly=mode==='monthly';
+  document.getElementById('mode-monthly').style.display=monthly?'':'none';
+  document.getElementById('mode-12m').style.display=monthly?'none':'';
+  document.getElementById('tab-monthly').classList.toggle('active',monthly);
+  document.getElementById('tab-12m').classList.toggle('active',!monthly);
+  if(monthly) setView(currentView); else buildM12();
+}
+
+// Init
+setView('all');
+document.getElementById('ins-all').classList.add('active');
+</script>
+</body>
+</html>
