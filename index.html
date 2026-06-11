@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -626,7 +627,7 @@
   </div><!-- /mode-monthly -->
 
   <div id="mode-12m" style="display:none">
-    <div class="banner-real">✅ Dados reais — Ortobom · últimos 12 meses. Ticket validado contra GMV÷pedidos. Demais lojas e visão consolidada aguardando os arquivos.</div>
+    <div class="banner-real">✅ Dados reais — uma aba por seller no arquivo <code>data/ANALISE_PERFORMANCE.xlsx</code>. Use o filtro de seller acima. Ticket validado contra GMV÷pedidos.</div>
 
     <div id="m12-kpis" class="kpi-strip mb-24"></div>
 
@@ -1259,37 +1260,50 @@ let N, QN, QSTART, NQ;
 function recomputeM12Dims(){ N=M12_MONTH_LABELS.length; QN=Math.min(12,N); QSTART=N-QN; NQ=Math.floor(QN/3); }
 recomputeM12Dims();
 
-// ── Carregamento de lojas a partir da pasta /data (CSV por loja) ──
-function parseStoreCSV(text){
-  const NAME={'MERCADO_LIVRE':'Mercado Livre','SHOPEE':'Shopee','MAGAZINE_LUIZA':'Magazine Luiza','CNOVA':'Cnova',
-    'AMAZON_GLOBAL_API':'Amazon','AMAZON':'Amazon','B2W_NEW_API':'B2W','B2W':'B2W','MADEIRA_MADEIRA':'Madeira Madeira',
-    'WEB_CONTINENTAL_NEW_API':'Web Continental','WEB_CONTINENTAL':'Web Continental','SHOPIFY':'Shopify',
-    'LEROY_MERLIN':'Leroy Merlin','RENNER':'Renner','ZEMA':'Zema','EFACIL':'eFácil','SHOPPING_LIVELO':'Shopping Livelo',
-    'TIKTOK_SHOP':'TikTok Shop','TIKTOK':'TikTok Shop'};
-  const COLOR={'Mercado Livre':'#185FA5','Shopee':'#E9960A','Magazine Luiza':'#C83264','Cnova':'#3B6D11',
-    'Madeira Madeira':'#7F77DD','Web Continental':'#636975','Amazon':'#9099AE','B2W':'#B4B9C4','Shopify':'#2AA9A0',
-    'Leroy Merlin':'#5B8C2A','Renner':'#C0568A','Zema':'#A0A6B2','eFácil':'#CDD0D8','Shopping Livelo':'#9B8CE0','TikTok Shop':'#222'};
-  const FB=['#7E8AA0','#B0758C','#6FA0C8','#A88C5A'];
-  const hasMoney=s=>String(s).indexOf('$')>=0;
-  const pv=s=>{ s=String(s).replace('R$','').replace(/\$/g,'').replace(/\./g,'').replace(',','.').replace(/\s/g,'').trim();
-    if(s===''||s==='-')return 0; const n=parseFloat(s); return isNaN(n)?0:n; };
-  const titleize=s=>s.replace(/_/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
-  const lines=text.split(/\r?\n/).filter(l=>l.trim()!=='' && (l.split(';')[0]||'').replace(/^\uFEFF/,'').trim()!=='');
-  const rows=lines.map(l=>l.split(';'));
-  const hdr=rows[0].slice(1).map(h=>(h||'').replace(/^\uFEFF/,'').trim());
-  const triplet = hdr.length>=2 && /pedido/i.test(hdr[1]||'');
-  let labels=[]; if(triplet){ for(let i=0;i<hdr.length;i+=3) labels.push(hdr[i]); } else { labels=hdr.slice(); }
+// ── Carregamento das lojas a partir de um único Excel em /data (uma aba por seller) ──
+const XLSX_PATH = 'data/ANALISE_PERFORMANCE.xlsx';
+const M12_NAME={'MERCADO_LIVRE':'Mercado Livre','SHOPEE':'Shopee','MAGAZINE_LUIZA':'Magazine Luiza','CNOVA':'Cnova',
+  'AMAZON_GLOBAL_API':'Amazon','AMAZON':'Amazon','B2W_NEW_API':'B2W','B2W':'B2W','MADEIRA_MADEIRA':'Madeira Madeira',
+  'WEB_CONTINENTAL_NEW_API':'Web Continental','WEB_CONTINENTAL':'Web Continental','SHOPIFY':'Shopify',
+  'LEROY_MERLIN':'Leroy Merlin','RENNER':'Renner','ZEMA':'Zema','EFACIL':'eFácil','SHOPPING_LIVELO':'Shopping Livelo',
+  'TIKTOK_SHOP':'TikTok Shop','TIKTOK':'TikTok Shop','SHEIN':'Shein'};
+const M12_COLOR={'Mercado Livre':'#185FA5','Shopee':'#E9960A','Magazine Luiza':'#C83264','Cnova':'#3B6D11',
+  'Madeira Madeira':'#7F77DD','Web Continental':'#636975','Amazon':'#9099AE','B2W':'#B4B9C4','Shopify':'#2AA9A0',
+  'Leroy Merlin':'#5B8C2A','Renner':'#C0568A','Zema':'#A0A6B2','eFácil':'#CDD0D8','Shopping Livelo':'#9B8CE0',
+  'TikTok Shop':'#1F1F1F','Shein':'#111'};
+const M12_FB=['#7E8AA0','#B0758C','#6FA0C8','#A88C5A','#6FB0A0'];
+function _pv(v){ if(typeof v==='number') return v; if(v==null) return 0;
+  let s=String(v).replace('R$','').replace(/\$/g,'').replace(/\./g,'').replace(',','.').replace(/\s/g,'').trim();
+  if(s===''||s==='-') return 0; const n=parseFloat(s); return isNaN(n)?0:n; }
+function _isIntNum(v){ return typeof v==='number' && Number.isInteger(v); }
+function _hasMoney(v){ return typeof v==='string' && v.indexOf('$')>=0; }
+function _label(s){ s=String(s).toLowerCase().replace('pedidos','').replace('ticket médio','').replace('ticket','').trim();
+  const p=s.split('/'); if(p.length<2) return s; return p[0].trim().slice(0,3)+'/'+p[1].trim(); }
+function _titleize(s){ return String(s).replace(/_/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()); }
+function _chName(raw){ raw=String(raw).trim(); return M12_NAME[raw] || _titleize(raw); }
+function parseSheet(rows){
+  if(!rows||!rows.length) return null;
+  const hdr=rows[0].slice(1);
+  const triplet = hdr.some(h=> typeof h==='string' && /pedido/i.test(h));
+  let labels=[];
+  if(triplet){ for(let i=0;i<hdr.length;i+=3) labels.push(_label(hdr[i+1]!=null?hdr[i+1]:hdr[i])); }
+  else { labels=hdr.map(h=>_label(h)); }
   let channels=[], fb=0;
   for(let r=1;r<rows.length;r++){
-    const raw=(rows[r][0]||'').replace(/^\uFEFF/,'').trim(); if(!raw) continue;
-    const name=NAME[raw]||titleize(raw); const cells=rows[r].slice(1); const gmv=[],ped=[];
+    const raw=rows[r][0]; if(raw==null||String(raw).trim()==='') continue;
+    const name=_chName(raw); const cells=rows[r].slice(1); const gmv=[],ped=[];
     for(let t=0;t<labels.length;t++){
-      if(triplet){ const a=cells[3*t]||'',b=cells[3*t+1]||'',c=cells[3*t+2]||''; let pc2;
-        if(hasMoney(b)&&!hasMoney(c))pc2=c; else if(hasMoney(c)&&!hasMoney(b))pc2=b; else pc2=b;
-        gmv.push(Math.round(pv(a))); ped.push(Math.round(pv(pc2))); }
-      else { gmv.push(Math.round(pv(cells[t]||''))); ped.push(0); }
+      if(triplet){
+        const a=cells[3*t], b=cells[3*t+1], c=cells[3*t+2]; let pedV;
+        if(_hasMoney(b)&&!_hasMoney(c)) pedV=c;
+        else if(_hasMoney(c)&&!_hasMoney(b)) pedV=b;
+        else if(_isIntNum(b)&&!_isIntNum(c)) pedV=b;
+        else if(_isIntNum(c)&&!_isIntNum(b)) pedV=c;
+        else pedV=b;
+        gmv.push(Math.round(_pv(a))); ped.push(Math.round(_pv(pedV)));
+      } else { gmv.push(Math.round(_pv(cells[t]))); ped.push(0); }
     }
-    let color=COLOR[name]; if(!color){ color=FB[fb%FB.length]; fb++; }
+    let color=M12_COLOR[name]; if(!color){ color=M12_FB[fb%M12_FB.length]; fb++; }
     channels.push({name,color,isML:name==='Mercado Livre',gmv,ped});
   }
   if(labels.length>12){ labels=labels.slice(-12); channels.forEach(c=>{c.gmv=c.gmv.slice(-12);c.ped=c.ped.slice(-12);}); }
@@ -1298,15 +1312,18 @@ function parseStoreCSV(text){
 }
 async function loadStoresFromData(){
   try{
-    const mr=await fetch('data/manifest.json',{cache:'no-store'}); if(!mr.ok) return null;
-    const manifest=await mr.json(); if(!Array.isArray(manifest)||!manifest.length) return null;
+    if(typeof XLSX==='undefined') return null;
+    const r=await fetch(XLSX_PATH,{cache:'no-store'}); if(!r.ok) return null;
+    const wb=XLSX.read(new Uint8Array(await r.arrayBuffer()),{type:'array'});
     const stores={}, names={}; let labels=null;
-    for(const s of manifest){
-      try{ const cr=await fetch('data/'+s.file,{cache:'no-store'}); if(!cr.ok) continue;
-        const parsed=parseStoreCSV(await cr.text());
-        stores[s.key]=parsed.channels; names[s.key]=s.name||s.key; labels=parsed.labels;
-      }catch(e){}
-    }
+    wb.SheetNames.forEach(sn=>{
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:null});
+      const parsed=parseSheet(rows); if(!parsed||!parsed.channels.length) return;
+      const disp=_titleize(String(sn).replace(/^an[aá]lise\s*/i,'').trim());
+      let key=String(sn).toLowerCase().replace(/^an[aá]lise\s*/i,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+      if(!key) key='loja'+(Object.keys(stores).length+1);
+      stores[key]=parsed.channels; names[key]=disp; labels=parsed.labels;
+    });
     return (Object.keys(stores).length && labels) ? {stores,names,labels} : null;
   }catch(e){ return null; }
 }
